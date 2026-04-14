@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Participant {
+  id          String    @id @default(cuid())
+  condition   String
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  consent     Boolean   @default(false)
+  currentStep Int       @default(0)
+  responses   Response[]
+  comments    Comment[]
+}
+
+model Response {
+  id            String      @id @default(cuid())
+  participantId String
+  participant   Participant @relation(fields: [participantId], references: [id])
+  surveyType    String
+  questionId    String
+  answer        String
+  createdAt     DateTime    @default(now())
+}
+
+model Comment {
+  id            String      @id @default(cuid())
+  participantId String
+  participant   Participant @relation(fields: [participantId], references: [id])
+  content       String
+  createdAt     DateTime    @default(now())
+}
