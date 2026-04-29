@@ -18,6 +18,27 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+## 실험 진입 경로
+
+실험은 루트(`/`)에 `condition` 쿼리 파라미터를 붙여 시작합니다.
+
+**URL 형식**: `/?condition=<조건키>`
+
+**예시**: [http://localhost:3000/?condition=ai_10](http://localhost:3000/?condition=ai_10)
+
+### 유효한 조건키 (총 6종)
+
+| 조건키 | AI 라벨 | 댓글 수 |
+| --- | --- | --- |
+| `ai_10` | 표시 | 10 |
+| `ai_20` | 표시 | 20 |
+| `ai_30` | 표시 | 30 |
+| `no_ai_10` | 미표시 | 10 |
+| `no_ai_20` | 미표시 | 20 |
+| `no_ai_30` | 미표시 | 30 |
+
+진입 후 자동 흐름: `/consent` → `/pre-survey` → `/instruction` → `/experiment` → `/post-survey` → `/debrief`
+
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More
