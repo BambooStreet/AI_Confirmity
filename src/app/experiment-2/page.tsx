@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import PageWrapper from "@/components/layout/PageWrapper";
-import CircleComparison from "@/components/experiment/CircleComparison";
+import DressDisplay from "@/components/experiment/DressDisplay";
 import CommentSection from "@/components/experiment/CommentSection";
-import { getCircleCommentsForCondition } from "@/data/circle-comments";
+import { getDressCommentsForCondition } from "@/data/dress-comments";
 import type { PresetComment } from "@/data/comments";
 import { parseCondition } from "@/lib/conditions";
 
@@ -25,7 +25,7 @@ export default function ExperimentTwoPage() {
     const parsed = parseCondition(condition);
     if (parsed) {
       setComments(
-        getCircleCommentsForCondition(parsed.commentCount, parsed.hasAiLabel)
+        getDressCommentsForCondition(parsed.commentCount, parsed.hasAiLabel)
       );
       setShowAiLabel(parsed.hasAiLabel);
     }
@@ -53,7 +53,7 @@ export default function ExperimentTwoPage() {
 
   return (
     <PageWrapper currentStep="experiment-2" maxWidth="lg">
-      <CircleComparison />
+      <DressDisplay />
       <CommentSection
         presetComments={comments}
         showAiLabel={showAiLabel}
