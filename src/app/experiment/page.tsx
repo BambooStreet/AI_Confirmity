@@ -14,6 +14,7 @@ export default function ExperimentPage() {
   const [comments, setComments] = useState<PresetComment[]>([]);
   const [showAiLabel, setShowAiLabel] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [hasCommented, setHasCommented] = useState(false);
 
   useEffect(() => {
     const pid = localStorage.getItem("participantId") || "";
@@ -54,11 +55,19 @@ export default function ExperimentPage() {
         presetComments={comments}
         showAiLabel={showAiLabel}
         participantId={participantId}
+        onUserCommentSubmitted={() => setHasCommented(true)}
       />
+
+      {!hasCommented && (
+        <p className="mt-6 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+          다음 단계로 넘어가려면 본인의 의견을 댓글로 작성해주세요.
+        </p>
+      )}
 
       <button
         onClick={handleNext}
-        className="mt-8 w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+        disabled={!hasCommented}
+        className="mt-4 w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
       >
         다음 (본실험2)
       </button>

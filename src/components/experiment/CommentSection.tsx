@@ -9,6 +9,7 @@ type CommentSectionProps = {
   presetComments: PresetComment[];
   showAiLabel: boolean;
   participantId: string;
+  onUserCommentSubmitted?: () => void;
 };
 
 type UserComment = {
@@ -22,6 +23,7 @@ export default function CommentSection({
   presetComments,
   showAiLabel,
   participantId,
+  onUserCommentSubmitted,
 }: CommentSectionProps) {
   const [userComments, setUserComments] = useState<UserComment[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,6 +48,7 @@ export default function CommentSection({
             timeAgo: "방금 전",
           },
         ]);
+        onUserCommentSubmitted?.();
       }
     } catch {
       // 에러 시 로컬에만 추가
@@ -58,6 +61,7 @@ export default function CommentSection({
           timeAgo: "방금 전",
         },
       ]);
+      onUserCommentSubmitted?.();
     } finally {
       setIsSubmitting(false);
     }
