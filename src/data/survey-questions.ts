@@ -35,25 +35,6 @@ export const preSurveyQuestions: SurveyQuestion[] = [
     type: "likert",
     required: true,
   },
-  {
-    id: "pre-5",
-    question: "AI가 생성한 콘텐츠(글, 이미지 등)를 접해본 경험이 있으신가요?",
-    type: "multiple_choice",
-    required: true,
-    options: [
-      "전혀 없다",
-      "1-2번 정도 있다",
-      "가끔 접한다",
-      "자주 접한다",
-      "매우 자주 접한다",
-    ],
-  },
-  {
-    id: "pre-6",
-    question: "AI가 작성한 댓글과 사람이 작성한 댓글을 구분할 수 있다고 생각하시나요?",
-    type: "likert",
-    required: true,
-  },
 ];
 
 export const postSurveyQuestions: SurveyQuestion[] = [
