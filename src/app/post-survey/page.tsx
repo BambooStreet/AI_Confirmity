@@ -30,7 +30,7 @@ export default function PostSurveyPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             participantId,
-            currentStep: 5,
+            currentStep: 6,
             completed: true,
           }),
         }),

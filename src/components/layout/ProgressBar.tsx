@@ -6,7 +6,8 @@ const STEP_LABELS: Record<Step, string> = {
   consent: "동의",
   "pre-survey": "사전 설문",
   instruction: "실험 안내",
-  experiment: "본 실험",
+  experiment: "본실험1",
+  "experiment-2": "본실험2",
   "post-survey": "사후 설문",
   debrief: "완료",
 };

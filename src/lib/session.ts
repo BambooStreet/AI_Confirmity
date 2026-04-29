@@ -3,6 +3,7 @@ export const STEPS = [
   "pre-survey",
   "instruction",
   "experiment",
+  "experiment-2",
   "post-survey",
   "debrief",
 ] as const;

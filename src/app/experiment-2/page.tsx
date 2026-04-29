@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import PageWrapper from "@/components/layout/PageWrapper";
-import NewsArticle from "@/components/experiment/NewsArticle";
+import CircleComparison from "@/components/experiment/CircleComparison";
 import CommentSection from "@/components/experiment/CommentSection";
-import { getCommentsForCondition, type PresetComment } from "@/data/comments";
+import { getCircleCommentsForCondition } from "@/data/circle-comments";
+import type { PresetComment } from "@/data/comments";
 import { parseCondition } from "@/lib/conditions";
 
-export default function ExperimentPage() {
+export default function ExperimentTwoPage() {
   const router = useRouter();
   const [participantId, setParticipantId] = useState<string>("");
   const [comments, setComments] = useState<PresetComment[]>([]);
@@ -22,7 +23,9 @@ export default function ExperimentPage() {
 
     const parsed = parseCondition(condition);
     if (parsed) {
-      setComments(getCommentsForCondition(parsed.commentCount, parsed.hasAiLabel));
+      setComments(
+        getCircleCommentsForCondition(parsed.commentCount, parsed.hasAiLabel)
+      );
       setShowAiLabel(parsed.hasAiLabel);
     }
     setLoaded(true);
@@ -33,10 +36,10 @@ export default function ExperimentPage() {
       await fetch("/api/participants", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ participantId, currentStep: 4 }),
+        body: JSON.stringify({ participantId, currentStep: 5 }),
       });
     }
-    router.push("/experiment-2");
+    router.push("/post-survey");
   };
 
   if (!loaded) {
@@ -48,8 +51,8 @@ export default function ExperimentPage() {
   }
 
   return (
-    <PageWrapper currentStep="experiment" maxWidth="lg">
-      <NewsArticle />
+    <PageWrapper currentStep="experiment-2" maxWidth="lg">
+      <CircleComparison />
       <CommentSection
         presetComments={comments}
         showAiLabel={showAiLabel}
@@ -60,7 +63,7 @@ export default function ExperimentPage() {
         onClick={handleNext}
         className="mt-8 w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors"
       >
-        다음 (본실험2)
+        다음 (사후 설문)
       </button>
     </PageWrapper>
   );
