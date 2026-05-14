@@ -20,24 +20,34 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 ## 실험 진입 경로
 
-실험은 루트(`/`)에 `condition` 쿼리 파라미터를 붙여 시작합니다.
+실험은 루트(`/`)에서 시작합니다. 두 가지 방법으로 진입할 수 있어요.
 
-**URL 형식**: `/?condition=<조건키>`
+1. **랜딩 페이지에서 직접 선택** — `/`에 접속하면 조건 드롭다운이 노출됩니다.
+2. **URL 쿼리로 자동 진입** — `/?condition=<조건키>` 형식이면 곧바로 참가자 등록 후 동의 페이지로 이동합니다.
 
 **예시**: [http://localhost:3000/?condition=ai_10](http://localhost:3000/?condition=ai_10)
 
-### 유효한 조건키 (총 6종)
+### 유효한 조건키 (총 12종)
 
-| 조건키 | AI 라벨 | 댓글 수 |
-| --- | --- | --- |
-| `ai_10` | 표시 | 10 |
-| `ai_20` | 표시 | 20 |
-| `ai_30` | 표시 | 30 |
-| `no_ai_10` | 미표시 | 10 |
-| `no_ai_20` | 미표시 | 20 |
-| `no_ai_30` | 미표시 | 30 |
+조건은 AI 라벨 표시 여부(2수준) × 댓글 수(6수준) 조합입니다.
 
-진입 후 자동 흐름: `/consent` → `/pre-survey` → `/instruction` → `/experiment` → `/post-survey` → `/debrief`
+| AI 라벨 \\ 댓글 수 | 5 | 10 | 15 | 20 | 25 | 30 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 표시 | `ai_5` | `ai_10` | `ai_15` | `ai_20` | `ai_25` | `ai_30` |
+| 미표시 | `no_ai_5` | `no_ai_10` | `no_ai_15` | `no_ai_20` | `no_ai_25` | `no_ai_30` |
+
+### 실험 구성
+
+- **본실험 1 — Asch 선분 비교 (4단계)**
+  1. 기준선·비교선 A/B/C 관찰
+  2. 기준선과 같은 길이의 비교선 1차 선택
+  3. 동일한 자극에 대한 커뮤니티 글 + N개의 (AI) 댓글 — AI 의견은 참가자가 고른 답과 다른 하나의 라벨로 통일됨. 본인 의견을 댓글로 남겨야 다음으로 진행
+  4. 비교선 2차 선택 (의견 변화 측정)
+- **본실험 2 — 존엄사 커뮤니티 (2단계)**
+  1. 존엄사 합법화에 대한 커뮤니티 글 + N개의 (AI) 댓글 읽기
+  2. 본인 의견을 댓글로 작성
+
+진입 후 자동 흐름: `/consent` → `/pre-survey` → `/instruction` → `/experiment` → `/experiment-2` → `/post-survey` → `/debrief`
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 

@@ -1,0 +1,115 @@
+"use client";
+
+import { useState } from "react";
+import RedditCommentItem from "./RedditCommentItem";
+import RedditCommentInput from "./RedditCommentInput";
+import type { PresetComment } from "@/data/comments";
+
+export type { PresetComment };
+
+type UserComment = {
+  id: string;
+  author: string;
+  content: string;
+  timeAgo: string;
+};
+
+type RedditCommentListProps = {
+  presetComments: PresetComment[];
+  showAiLabel: boolean;
+  participantId: string;
+  inputPlaceholder?: string;
+  inputButtonLabel?: string;
+  inputMinLength?: number;
+  showInput?: boolean;
+  onUserCommentSubmitted?: (content: string) => void;
+};
+
+export default function RedditCommentList({
+  presetComments,
+  showAiLabel,
+  participantId,
+  inputPlaceholder,
+  inputButtonLabel,
+  inputMinLength,
+  showInput = true,
+  onUserCommentSubmitted,
+}: RedditCommentListProps) {
+  const [userComments, setUserComments] = useState<UserComment[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (content: string) => {
+    setIsSubmitting(true);
+    let newId = `local-${Date.now()}`;
+    try {
+      const res = await fetch("/api/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ participantId, content }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.id) newId = data.id;
+      }
+    } catch {
+      // fall through to local-only
+    } finally {
+      setUserComments((prev) => [
+        ...prev,
+        { id: newId, author: "나", content, timeAgo: "방금 전" },
+      ]);
+      setIsSubmitting(false);
+      onUserCommentSubmitted?.(content);
+    }
+  };
+
+  const totalComments = presetComments.length + userComments.length;
+
+  return (
+    <section className="mt-4 bg-white border border-gray-200 rounded-md p-4">
+      <div className="flex items-center gap-2 pb-3 border-b border-gray-200">
+        <span className="text-sm font-bold text-gray-900">
+          {totalComments} Comments
+        </span>
+        <span className="text-xs text-gray-400">Sort by: Best</span>
+      </div>
+
+      {showInput && (
+        <div className="my-4">
+          <RedditCommentInput
+            onSubmit={handleSubmit}
+            isSubmitting={isSubmitting}
+            placeholder={inputPlaceholder}
+            buttonLabel={inputButtonLabel}
+            minLength={inputMinLength}
+          />
+        </div>
+      )}
+
+      <div className="divide-y divide-gray-100">
+        {userComments.map((c) => (
+          <RedditCommentItem
+            key={c.id}
+            author={c.author}
+            content={c.content}
+            timeAgo={c.timeAgo}
+            score={1}
+            showAiLabel={false}
+            isCurrentUser
+          />
+        ))}
+
+        {presetComments.map((c) => (
+          <RedditCommentItem
+            key={c.id}
+            author={c.author}
+            content={c.content}
+            timeAgo={c.timeAgo}
+            score={c.likes}
+            showAiLabel={showAiLabel && c.isAiGenerated}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}

@@ -255,17 +255,18 @@ const additionalComments: PresetComment[] = [
   },
 ];
 
+import type { CommentCount } from "@/lib/conditions";
+
 export function getCommentsForCondition(
-  commentCount: 10 | 20 | 30,
+  commentCount: CommentCount,
   hasAiLabel: boolean
 ): PresetComment[] {
-  const needed = commentCount - baseNegativeComments.length;
-  const extra = additionalComments.slice(0, Math.max(0, needed));
-  const allComments = [...baseNegativeComments, ...extra];
+  const pool = [...baseNegativeComments, ...additionalComments];
+  const sliced = pool.slice(0, commentCount);
 
   if (!hasAiLabel) {
-    return allComments.map((c) => ({ ...c, isAiGenerated: false }));
+    return sliced.map((c) => ({ ...c, isAiGenerated: false }));
   }
 
-  return allComments;
+  return sliced;
 }

@@ -1,14 +1,23 @@
+export const COMMENT_COUNTS = [5, 10, 15, 20, 25, 30] as const;
+export type CommentCount = (typeof COMMENT_COUNTS)[number];
+
 export type ExperimentCondition = {
   hasAiLabel: boolean;
-  commentCount: 10 | 20 | 30;
+  commentCount: CommentCount;
 };
 
 export const VALID_CONDITIONS = [
+  "ai_5",
   "ai_10",
+  "ai_15",
   "ai_20",
+  "ai_25",
   "ai_30",
+  "no_ai_5",
   "no_ai_10",
+  "no_ai_15",
   "no_ai_20",
+  "no_ai_25",
   "no_ai_30",
 ] as const;
 
@@ -21,7 +30,7 @@ export function parseCondition(condition: string): ExperimentCondition | null {
 
   const hasAiLabel = condition.startsWith("ai_");
   const countStr = condition.replace(/^(no_)?ai_/, "");
-  const commentCount = parseInt(countStr, 10) as 10 | 20 | 30;
+  const commentCount = parseInt(countStr, 10) as CommentCount;
 
   return { hasAiLabel, commentCount };
 }
