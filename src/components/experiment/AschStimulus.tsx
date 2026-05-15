@@ -19,6 +19,12 @@ type AschStimulusProps = {
   selected?: AschLineLabel | null;
   onSelect?: (label: AschLineLabel) => void;
   highlight?: AschLineLabel | null;
+  /**
+   * - "full": 기준 선분 + 비교 선분 모두 표시 (기본)
+   * - "reference": 기준 선분만
+   * - "comparison": 비교 선분만
+   */
+  variant?: "full" | "reference" | "comparison";
 };
 
 function LineRow({
@@ -71,42 +77,50 @@ export default function AschStimulus({
   selected = null,
   onSelect,
   highlight = null,
+  variant = "full",
 }: AschStimulusProps) {
-  return (
-    <div className="bg-gray-50 border border-gray-200 rounded-md p-4 sm:p-6">
-      <div className="mb-4">
-        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
-          기준 선분
-        </p>
-        <div className="flex items-center gap-4 sm:gap-6 py-3 px-3 sm:px-4 bg-white border border-gray-200 rounded-md">
-          <span className="text-base font-bold text-gray-900 w-6 shrink-0">
-            ★
-          </span>
-          <span
-            className="block h-1.5 bg-gray-900 rounded-sm"
-            style={{ width: `${ASCH_REFERENCE_LENGTH}px`, maxWidth: "100%" }}
-            aria-label="reference line"
-          />
-        </div>
-      </div>
+  const showReference = variant !== "comparison";
+  const showComparison = variant !== "reference";
 
-      <div>
-        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
-          비교 선분
-        </p>
-        <div className="space-y-2">
-          {ASCH_LABELS.map((label) => (
-            <LineRow
-              key={label}
-              label={label}
-              length={ASCH_LENGTHS[label]}
-              selected={selectable && selected === label}
-              highlight={!selectable && highlight === label}
-              onClick={selectable ? () => onSelect?.(label) : undefined}
+  return (
+    <div className="bg-blue-50/40 border-2 border-blue-300 rounded-lg p-4 sm:p-6 shadow-md ring-1 ring-blue-200/60">
+      {showReference && (
+        <div className={showComparison ? "mb-4" : ""}>
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+            기준 선분
+          </p>
+          <div className="flex items-center gap-4 sm:gap-6 py-3 px-3 sm:px-4 bg-white border border-gray-200 rounded-md">
+            <span className="text-base font-bold text-gray-900 w-6 shrink-0">
+              ★
+            </span>
+            <span
+              className="block h-1.5 bg-gray-900 rounded-sm"
+              style={{ width: `${ASCH_REFERENCE_LENGTH}px`, maxWidth: "100%" }}
+              aria-label="reference line"
             />
-          ))}
+          </div>
         </div>
-      </div>
+      )}
+
+      {showComparison && (
+        <div>
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+            비교 선분
+          </p>
+          <div className="space-y-2">
+            {ASCH_LABELS.map((label) => (
+              <LineRow
+                key={label}
+                label={label}
+                length={ASCH_LENGTHS[label]}
+                selected={selectable && selected === label}
+                highlight={!selectable && highlight === label}
+                onClick={selectable ? () => onSelect?.(label) : undefined}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

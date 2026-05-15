@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import PageWrapper from "@/components/layout/PageWrapper";
 import AschStimulus, {
@@ -40,12 +40,25 @@ export default function ExperimentPage() {
   const { participantId, commentCount, hasAiLabel, isReady } =
     useExperimentSession();
 
+  const STAGE1_SECONDS = 3;
   const [stage, setStage] = useState<Stage>(1);
   const [initialChoice, setInitialChoice] = useState<AschLineLabel | null>(null);
   const [stageSelection, setStageSelection] = useState<AschLineLabel | null>(null);
   const [aiClaim, setAiClaim] = useState<AschLineLabel | null>(null);
   const [hasCommented, setHasCommented] = useState(false);
   const [advancing, setAdvancing] = useState(false);
+  const [stage1Remaining, setStage1Remaining] = useState(STAGE1_SECONDS);
+
+  // 단계 1: 기준 선분 STAGE1_SECONDS초 노출 후 자동으로 단계 2로 이동
+  useEffect(() => {
+    if (stage !== 1) return;
+    if (stage1Remaining <= 0) {
+      setStage(2);
+      return;
+    }
+    const t = setTimeout(() => setStage1Remaining((r) => r - 1), 1000);
+    return () => clearTimeout(t);
+  }, [stage, stage1Remaining]);
 
   const aschComments = useMemo(
     () => (aiClaim ? buildAschComments(commentCount, aiClaim, hasAiLabel) : []),
@@ -59,8 +72,6 @@ export default function ExperimentPage() {
       </div>
     );
   }
-
-  const handleStage1Next = () => setStage(2);
 
   const handleStage2Next = async () => {
     if (!stageSelection || advancing) return;
@@ -122,31 +133,35 @@ export default function ExperimentPage() {
       {stage === 1 && (
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            아래 선분들을 살펴보세요
+            기준 선분을 잘 기억해주세요
           </h2>
           <p className="text-sm text-gray-600 mb-6">
-            기준 선분(★)과 비교 선분(A·B·C)을 충분히 비교해보세요. 다음 단계에서 답을
-            선택하게 됩니다.
+            {stage1Remaining}초 뒤 자동으로 다음 단계로 넘어갑니다.
           </p>
-          <AschStimulus />
-          <button
-            onClick={handleStage1Next}
-            className="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-          >
-            다음
-          </button>
+          <AschStimulus variant="reference" />
+          <div className="mt-6 h-1 w-full overflow-hidden rounded-full bg-gray-200">
+            <div
+              className="h-full bg-blue-600 transition-all duration-1000 ease-linear"
+              style={{
+                width: `${
+                  ((STAGE1_SECONDS - stage1Remaining) / STAGE1_SECONDS) * 100
+                }%`,
+              }}
+            />
+          </div>
         </section>
       )}
 
       {stage === 2 && (
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            기준 선분(★)과 길이가 같은 비교 선분은 무엇인가요?
+            방금 본 기준 선분(★)과 길이가 같은 비교 선분은 무엇인가요?
           </h2>
           <p className="text-sm text-gray-600 mb-6">
             A·B·C 중 기준선과 가장 가까운 길이의 선분을 하나 골라주세요.
           </p>
           <AschStimulus
+            variant="comparison"
             selectable
             selected={stageSelection}
             onSelect={setStageSelection}
@@ -175,7 +190,7 @@ export default function ExperimentPage() {
               기준선과 같은 길이의 비교선이 뭔지 의견 좀 모아봅시다. 댓글로 본인
               답이랑 이유 같이 남겨주세요.
             </p>
-            <AschStimulus />
+            <AschStimulus variant="comparison" />
           </RedditPost>
 
           <RedditCommentList
@@ -209,10 +224,11 @@ export default function ExperimentPage() {
             다시 한 번 골라주세요
           </h2>
           <p className="text-sm text-gray-600 mb-6">
-            방금 댓글들을 보고 난 뒤, 기준 선분(★)과 길이가 같은 비교 선분을 다시
-            선택해주세요. 의견을 바꿔도 좋고, 그대로 유지해도 좋습니다.
+            방금 댓글들을 보고 난 뒤, 처음에 본 기준 선분(★)과 길이가 같은 비교
+            선분을 다시 선택해주세요. 의견을 바꿔도 좋고, 그대로 유지해도 좋습니다.
           </p>
           <AschStimulus
+            variant="comparison"
             selectable
             selected={stageSelection}
             onSelect={setStageSelection}
