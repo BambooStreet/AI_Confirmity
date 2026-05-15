@@ -25,7 +25,7 @@ export const preSurveyQuestions: SurveyQuestion[] = [
   },
   {
     id: "pre-3",
-    question: "평소 온라인 뉴스 댓글을 얼마나 자주 읽으시나요?",
+    question: "평소 온라인 커뮤니티의 게시글이나 댓글을 얼마나 자주 읽으시나요?",
     type: "likert",
     required: true,
   },
@@ -40,13 +40,13 @@ export const preSurveyQuestions: SurveyQuestion[] = [
 export const postSurveyQuestions: SurveyQuestion[] = [
   {
     id: "post-1",
-    question: "방금 읽은 기사의 내용에 대해 어떻게 생각하시나요?",
+    question: "방금 읽은 게시글들의 내용에 대해 어떻게 생각하시나요?",
     type: "likert",
     required: true,
   },
   {
     id: "post-2",
-    question: "기사에 달린 댓글들이 귀하의 의견 형성에 영향을 미쳤다고 생각하시나요?",
+    question: "게시글에 달린 댓글들이 귀하의 의견 형성에 영향을 미쳤다고 생각하시나요?",
     type: "likert",
     required: true,
   },

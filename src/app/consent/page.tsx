@@ -31,13 +31,13 @@ export default function ConsentPage() {
 
       <div className="prose prose-sm max-w-none text-gray-700 space-y-4 mb-8">
         <h2 className="text-lg font-semibold text-gray-900">연구 제목</h2>
-        <p>온라인 뉴스 댓글에 대한 이용자 인식 연구</p>
+        <p>온라인 커뮤니티 게시글·댓글에 대한 이용자 인식 연구</p>
 
         <h2 className="text-lg font-semibold text-gray-900">연구 절차</h2>
         <p>
-          본 연구에 참여하시면 간단한 사전 설문에 응답한 후, 뉴스 기사를 읽고 댓글을
-          확인하게 됩니다. 이후 사후 설문에 응답하시면 실험이 완료됩니다. 전체
-          소요시간은 약 15-20분입니다.
+          본 연구에 참여하시면 간단한 사전 설문에 응답한 후, 온라인 커뮤니티의
+          게시글과 댓글을 읽고 본인의 의견을 남기게 됩니다. 이후 사후 설문에
+          응답하시면 실험이 완료됩니다. 전체 소요시간은 약 15-20분입니다.
         </p>
 
         <h2 className="text-lg font-semibold text-gray-900">개인정보 보호</h2>

@@ -44,7 +44,7 @@ export default function PostSurveyPage() {
     <PageWrapper currentStep="post-survey">
       <h1 className="text-2xl font-bold text-gray-900 mb-2">사후 설문</h1>
       <p className="text-sm text-gray-500 mb-6">
-        기사와 댓글을 읽은 후의 의견을 응답해주세요.
+        게시글과 댓글을 읽은 후의 의견을 응답해주세요.
       </p>
 
       <SurveyForm
