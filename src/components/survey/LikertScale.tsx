@@ -1,6 +1,6 @@
 "use client";
 
-import { likertLabels } from "@/data/survey-questions";
+import { likert7Labels } from "@/data/survey-questions";
 
 type LikertScaleProps = {
   questionId: string;
@@ -23,23 +23,42 @@ export default function LikertScale({
         {question}
         {required && <span className="text-red-500 ml-1">*</span>}
       </p>
-      <div className="flex justify-between gap-2">
-        {likertLabels.map((label, index) => (
-          <label
-            key={index}
-            className="flex flex-col items-center gap-1 cursor-pointer flex-1"
-          >
-            <input
-              type="radio"
-              name={questionId}
-              value={String(index + 1)}
-              checked={value === String(index + 1)}
-              onChange={() => onChange(questionId, String(index + 1))}
-              className="w-4 h-4 text-blue-600"
-            />
-            <span className="text-xs text-gray-500 text-center">{label}</span>
-          </label>
-        ))}
+      <div className="grid grid-cols-7 gap-1.5">
+        {likert7Labels.map((label, index) => {
+          const score = String(index + 1);
+          const selected = value === score;
+          return (
+            <label
+              key={index}
+              className={`flex flex-col items-center gap-2 rounded-lg border px-1 py-2 text-xs cursor-pointer transition-colors ${
+                selected
+                  ? "border-blue-600 bg-blue-50"
+                  : "border-gray-200 bg-white hover:border-gray-300"
+              }`}
+            >
+              <input
+                type="radio"
+                name={questionId}
+                value={score}
+                checked={selected}
+                onChange={() => onChange(questionId, score)}
+                className="sr-only"
+              />
+              <span
+                className={`flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold ${
+                  selected
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-600"
+                }`}
+              >
+                {index + 1}
+              </span>
+              <span className="text-center leading-tight text-gray-600">
+                {label}
+              </span>
+            </label>
+          );
+        })}
       </div>
     </div>
   );
