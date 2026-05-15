@@ -33,12 +33,6 @@ export default function ConsentPage() {
         <h2 className="text-lg font-semibold text-gray-900">연구 제목</h2>
         <p>온라인 뉴스 댓글에 대한 이용자 인식 연구</p>
 
-        <h2 className="text-lg font-semibold text-gray-900">연구 목적</h2>
-        <p>
-          본 연구는 온라인 뉴스 환경에서 이용자들이 댓글을 어떻게 인식하고 반응하는지를
-          이해하기 위해 수행됩니다.
-        </p>
-
         <h2 className="text-lg font-semibold text-gray-900">연구 절차</h2>
         <p>
           본 연구에 참여하시면 간단한 사전 설문에 응답한 후, 뉴스 기사를 읽고 댓글을
