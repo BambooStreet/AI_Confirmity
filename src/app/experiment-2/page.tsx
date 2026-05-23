@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import PageWrapper from "@/components/layout/PageWrapper";
 import RedditPost from "@/components/community/RedditPost";
@@ -24,15 +24,24 @@ const LIKERT_LABELS = [
   "매우 찬성",
 ];
 
-const QUIZ_Q1_OPTIONS = ["합법이다", "불법이다", "모르겠다"];
-const QUIZ_Q1_ANSWER = "불법이다";
+const QUIZ_HOLD_SECONDS = 15;
 
-const QUIZ_Q2_OPTIONS = [
-  "인공호흡기 등 연명 의료 중단",
-  "의료진이 처방한 약물을 통한 사망",
-  "호스피스 입원 자체",
+const QUIZ_Q1_QUESTION = "존엄사는 어떤 환자를 대상으로 하나요?";
+const QUIZ_Q1_OPTIONS = [
+  "회복 가능성이 없는 환자",
+  "감기에 걸린 환자",
+  "건강한 일반인",
 ];
-const QUIZ_Q2_ANSWER = "인공호흡기 등 연명 의료 중단";
+const QUIZ_Q1_ANSWER = "회복 가능성이 없는 환자";
+
+const QUIZ_Q2_QUESTION =
+  "다음 중 소극적 존엄사(연명의료 중단)에 해당하는 것은 무엇인가요?";
+const QUIZ_Q2_OPTIONS = [
+  "인공호흡기 등 연명 치료를 중단하는 것",
+  "건강한 사람의 운동을 중단하는 것",
+  "병원의 일반 외래 진료를 받지 않는 것",
+];
+const QUIZ_Q2_ANSWER = "인공호흡기 등 연명 치료를 중단하는 것";
 
 async function saveEuthanasiaResponse(
   participantId: string,
@@ -199,8 +208,25 @@ export default function ExperimentTwoPage() {
   // Quiz state
   const [quiz1, setQuiz1] = useState<string | null>(null);
   const [quiz2, setQuiz2] = useState<string | null>(null);
+  const [quiz1Locked, setQuiz1Locked] = useState(false);
+  const [quiz2Locked, setQuiz2Locked] = useState(false);
   const [quizAttempts, setQuizAttempts] = useState(0);
   const [quizFeedback, setQuizFeedback] = useState<string | null>(null);
+  const [holdingRemaining, setHoldingRemaining] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (stage !== 1 || holdingRemaining === null) return;
+    if (holdingRemaining <= 0) {
+      setHoldingRemaining(null);
+      setStage(2);
+      return;
+    }
+    const t = setTimeout(
+      () => setHoldingRemaining((r) => (r === null ? null : r - 1)),
+      1000
+    );
+    return () => clearTimeout(t);
+  }, [stage, holdingRemaining]);
 
   const comments: PresetComment[] = useMemo(() => {
     if (preOpinion === null) return [];
@@ -219,24 +245,49 @@ export default function ExperimentTwoPage() {
     );
   }
 
-  const handleStage1Next = () => setStage(2);
+  const handleStage1Next = () => {
+    if (holdingRemaining !== null) return;
+    setStage(2);
+  };
 
   const handleQuizSubmit = async () => {
-    if (!quiz1 || !quiz2 || advancing) return;
+    if (advancing) return;
+    if (!quiz1Locked && !quiz1) return;
+    if (!quiz2Locked && !quiz2) return;
+
     const nextAttempts = quizAttempts + 1;
     setQuizAttempts(nextAttempts);
-    const correct1 = quiz1 === QUIZ_Q1_ANSWER;
-    const correct2 = quiz2 === QUIZ_Q2_ANSWER;
+
+    const correct1 = quiz1Locked || quiz1 === QUIZ_Q1_ANSWER;
+    const correct2 = quiz2Locked || quiz2 === QUIZ_Q2_ANSWER;
+
     if (!correct1 || !correct2) {
-      setQuizFeedback(
-        "오답이 있습니다. 위 설명을 다시 확인하고 답을 골라주세요."
-      );
+      if (!quiz1Locked) {
+        if (correct1) setQuiz1Locked(true);
+        else setQuiz1(null);
+      }
+      if (!quiz2Locked) {
+        if (correct2) setQuiz2Locked(true);
+        else setQuiz2(null);
+      }
+      setQuizFeedback(null);
+      setHoldingRemaining(QUIZ_HOLD_SECONDS);
+      setStage(1);
       return;
     }
+
     setQuizFeedback(null);
     if (participantId) {
-      await saveEuthanasiaResponse(participantId, "quiz_q1", quiz1);
-      await saveEuthanasiaResponse(participantId, "quiz_q2", quiz2);
+      await saveEuthanasiaResponse(
+        participantId,
+        "quiz_q1",
+        quiz1 ?? QUIZ_Q1_ANSWER
+      );
+      await saveEuthanasiaResponse(
+        participantId,
+        "quiz_q2",
+        quiz2 ?? QUIZ_Q2_ANSWER
+      );
       await saveEuthanasiaResponse(
         participantId,
         "quiz_attempts",
@@ -310,9 +361,32 @@ export default function ExperimentTwoPage() {
 
       {stage === 1 && (
         <section>
-          <p className="text-sm text-gray-600 mb-4">
-            아래 글을 읽고 이어지는 질문에 답해주세요.
-          </p>
+          {holdingRemaining !== null ? (
+            <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              <p className="font-semibold mb-1">
+                오답이 있어요. 아래 설명을 다시 한 번 읽어주세요.
+              </p>
+              <p>
+                {holdingRemaining}초 뒤에 자동으로 틀린 문항만 다시 출제됩니다.
+              </p>
+              <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-amber-100">
+                <div
+                  className="h-full bg-amber-500 transition-all duration-1000 ease-linear"
+                  style={{
+                    width: `${
+                      ((QUIZ_HOLD_SECONDS - holdingRemaining) /
+                        QUIZ_HOLD_SECONDS) *
+                      100
+                    }%`,
+                  }}
+                />
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-600 mb-4">
+              아래 글을 읽고 이어지는 질문에 답해주세요.
+            </p>
+          )}
           <h2 className="text-lg font-semibold text-gray-900 mb-3">
             존엄사란 무엇인가요?
           </h2>
@@ -343,9 +417,12 @@ export default function ExperimentTwoPage() {
           </div>
           <button
             onClick={handleStage1Next}
-            className="mt-2 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            disabled={holdingRemaining !== null}
+            className="mt-2 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            다음
+            {holdingRemaining !== null
+              ? `${holdingRemaining}초 뒤 자동으로 진행`
+              : "다음"}
           </button>
         </section>
       )}
@@ -356,30 +433,35 @@ export default function ExperimentTwoPage() {
             확인 퀴즈
           </h2>
           <p className="text-sm text-gray-600 mb-6">
-            앞 페이지의 설명을 바탕으로 두 문항 모두 정답을 골라주세요. 두 문항이
-            모두 맞아야 다음으로 넘어갈 수 있습니다.
+            {quiz1Locked || quiz2Locked
+              ? "앞서 틀린 문항을 다시 풀어주세요. 모두 맞아야 다음으로 넘어갈 수 있습니다."
+              : "앞 페이지의 설명을 바탕으로 두 문항 모두 정답을 골라주세요. 두 문항이 모두 맞아야 다음으로 넘어갈 수 있습니다."}
           </p>
 
-          <QuizQuestion
-            label="1"
-            question="조력 존엄사(적극적 존엄사)는 한국에서 현재 어떻게 다뤄지고 있나요?"
-            options={QUIZ_Q1_OPTIONS}
-            value={quiz1}
-            onChange={(v) => {
-              setQuiz1(v);
-              setQuizFeedback(null);
-            }}
-          />
-          <QuizQuestion
-            label="2"
-            question="다음 중 소극적 존엄사(연명의료 중단)에 해당하는 것은 무엇인가요?"
-            options={QUIZ_Q2_OPTIONS}
-            value={quiz2}
-            onChange={(v) => {
-              setQuiz2(v);
-              setQuizFeedback(null);
-            }}
-          />
+          {!quiz1Locked && (
+            <QuizQuestion
+              label="1"
+              question={QUIZ_Q1_QUESTION}
+              options={QUIZ_Q1_OPTIONS}
+              value={quiz1}
+              onChange={(v) => {
+                setQuiz1(v);
+                setQuizFeedback(null);
+              }}
+            />
+          )}
+          {!quiz2Locked && (
+            <QuizQuestion
+              label={quiz1Locked ? "1" : "2"}
+              question={QUIZ_Q2_QUESTION}
+              options={QUIZ_Q2_OPTIONS}
+              value={quiz2}
+              onChange={(v) => {
+                setQuiz2(v);
+                setQuizFeedback(null);
+              }}
+            />
+          )}
 
           {quizFeedback && (
             <p className="mb-4 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
@@ -389,7 +471,11 @@ export default function ExperimentTwoPage() {
 
           <button
             onClick={handleQuizSubmit}
-            disabled={!quiz1 || !quiz2 || advancing}
+            disabled={
+              advancing ||
+              (!quiz1Locked && !quiz1) ||
+              (!quiz2Locked && !quiz2)
+            }
             className="mt-2 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             제출

@@ -90,7 +90,8 @@ export const preSurveyQuestions: SurveyQuestion[] = [
   // ---------- Page 2: 온라인 커뮤니티 이용 ----------
   {
     id: "C1",
-    question: "나는 온라인 커뮤니티를 이용한 경험이 있다.",
+    question:
+      "나는 온라인 커뮤니티(예: 텀블러, 레딧, 더쿠, 디시인사이드, 네이버 카페 등)를 이용한 경험이 있다.",
     type: "multiple_choice",
     required: true,
     options: yesNoOptions,
@@ -201,12 +202,12 @@ export const postSurveyQuestions: SurveyQuestion[] = [
   {
     id: "psc-1",
     question:
-      "100명 중 몇 명이 방금 보신 댓글에 나타난 주장에 동의할 것이라고 생각하십니까?",
+      "방금 보신 댓글에 나타난 주장에 대해 전체의 몇 %가 동의할 것이라고 생각하나요?",
     type: "number",
     required: true,
     min: 0,
     max: 100,
-    unit: "명",
+    unit: "%",
     page: 1,
   },
   {

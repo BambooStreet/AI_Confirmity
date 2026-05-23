@@ -244,8 +244,12 @@ export default function ExperimentPage() {
             commentCount={aschComments.length}
           >
             <p className="mb-4 text-gray-700">
-              기준선과 같은 길이의 비교선이 뭔지 의견 좀 모아봅시다. 댓글로 본인
-              답이랑 이유 같이 남겨주세요.
+              앞서 보여드린 <strong>기준 선분(★)</strong>과 같은 길이의 비교선이
+              뭔지 의견 좀 모아봅시다. 댓글로 본인 답이랑 이유 같이 남겨주세요.
+            </p>
+            <p className="mb-4 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800">
+              ※ &lsquo;기준 선분&rsquo;은 단계 1에서 잠깐 보여드렸던 ★ 표시의
+              선분을 말합니다. 그 선분과 길이가 같은 비교선(A·B·C)을 찾아주세요.
             </p>
             <AschStimulus variant="comparison" />
           </RedditPost>

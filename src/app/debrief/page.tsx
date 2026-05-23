@@ -34,9 +34,11 @@ export default function DebriefPage() {
           <p className="text-sm text-gray-600 leading-relaxed">
             문의사항이 있으시면 아래로 연락해주세요.
             <br />
-            연구 책임자: [연구자 이름]
+            연구 책임자: 이해윤
             <br />
-            이메일: [이메일 주소]
+            이메일: hailey99@g.skku.edu
+            <br />
+            소속: 성균관대학교 인터랙션사이언스학과
           </p>
         </div>
       </div>
