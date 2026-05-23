@@ -5,10 +5,14 @@ import { useRouter } from "next/navigation";
 import PageWrapper from "@/components/layout/PageWrapper";
 import RedditPost from "@/components/community/RedditPost";
 import RedditCommentList from "@/components/community/RedditCommentList";
-import { getCommentsForCondition, type PresetComment } from "@/data/comments";
+import {
+  getCommentsForCondition,
+  stanceForPreOpinion,
+  type PresetComment,
+} from "@/data/comments";
 import { useExperimentSession } from "@/lib/useExperimentSession";
 
-type Stage = 1 | 2 | 3 | 4;
+type Stage = 1 | 2 | 3 | 4 | 5;
 
 const LIKERT_LABELS = [
   "매우 반대",
@@ -19,6 +23,16 @@ const LIKERT_LABELS = [
   "찬성",
   "매우 찬성",
 ];
+
+const QUIZ_Q1_OPTIONS = ["합법이다", "불법이다", "모르겠다"];
+const QUIZ_Q1_ANSWER = "불법이다";
+
+const QUIZ_Q2_OPTIONS = [
+  "인공호흡기 등 연명 의료 중단",
+  "의료진이 처방한 약물을 통한 사망",
+  "호스피스 입원 자체",
+];
+const QUIZ_Q2_ANSWER = "인공호흡기 등 연명 의료 중단";
 
 async function saveEuthanasiaResponse(
   participantId: string,
@@ -82,6 +96,89 @@ function LikertScale({
   );
 }
 
+function ConfidenceScale({
+  value,
+  onChange,
+}: {
+  value: number | null;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
+      <p className="text-sm font-medium text-gray-800 mb-3">
+        본인의 선택에 얼마나 확신하십니까?
+      </p>
+      <div className="grid grid-cols-7 gap-1.5">
+        {Array.from({ length: 7 }, (_, i) => i + 1).map((score) => {
+          const selected = value === score;
+          return (
+            <button
+              key={score}
+              type="button"
+              onClick={() => onChange(score)}
+              className={`flex h-9 items-center justify-center rounded-md border text-sm font-semibold transition-colors ${
+                selected
+                  ? "border-blue-600 bg-blue-600 text-white"
+                  : "border-gray-300 bg-white text-gray-600 hover:border-gray-400"
+              }`}
+            >
+              {score}
+            </button>
+          );
+        })}
+      </div>
+      <div className="mt-2 flex justify-between text-[11px] text-gray-500">
+        <span>1 = 전혀 확신 안 함</span>
+        <span>7 = 매우 확신함</span>
+      </div>
+    </div>
+  );
+}
+
+function QuizQuestion({
+  label,
+  question,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  question: string;
+  options: string[];
+  value: string | null;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="mb-6">
+      <p className="text-sm font-semibold text-gray-800 mb-2">
+        <span className="mr-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[11px] font-bold text-white">
+          {label}
+        </span>
+        {question}
+      </p>
+      <div className="space-y-2">
+        {options.map((opt) => {
+          const selected = value === opt;
+          return (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => onChange(opt)}
+              className={`block w-full rounded-lg border px-4 py-2.5 text-left text-sm transition-colors ${
+                selected
+                  ? "border-blue-600 bg-blue-50 text-blue-800"
+                  : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
+              }`}
+            >
+              {opt}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function ExperimentTwoPage() {
   const router = useRouter();
   const { participantId, commentCount, hasAiLabel, isReady } =
@@ -89,14 +186,30 @@ export default function ExperimentTwoPage() {
 
   const [stage, setStage] = useState<Stage>(1);
   const [preOpinion, setPreOpinion] = useState<number | null>(null);
+  const [preOpinionConfidence, setPreOpinionConfidence] = useState<number | null>(
+    null
+  );
   const [finalOpinion, setFinalOpinion] = useState<number | null>(null);
+  const [finalOpinionConfidence, setFinalOpinionConfidence] = useState<
+    number | null
+  >(null);
   const [hasCommented, setHasCommented] = useState(false);
   const [advancing, setAdvancing] = useState(false);
 
-  const comments: PresetComment[] = useMemo(
-    () => getCommentsForCondition(commentCount, hasAiLabel),
-    [commentCount, hasAiLabel]
-  );
+  // Quiz state
+  const [quiz1, setQuiz1] = useState<string | null>(null);
+  const [quiz2, setQuiz2] = useState<string | null>(null);
+  const [quizAttempts, setQuizAttempts] = useState(0);
+  const [quizFeedback, setQuizFeedback] = useState<string | null>(null);
+
+  const comments: PresetComment[] = useMemo(() => {
+    if (preOpinion === null) return [];
+    return getCommentsForCondition(
+      commentCount,
+      hasAiLabel,
+      stanceForPreOpinion(preOpinion)
+    );
+  }, [commentCount, hasAiLabel, preOpinion]);
 
   if (!isReady) {
     return (
@@ -108,8 +221,33 @@ export default function ExperimentTwoPage() {
 
   const handleStage1Next = () => setStage(2);
 
-  const handleStage2Next = async () => {
-    if (preOpinion === null || advancing) return;
+  const handleQuizSubmit = async () => {
+    if (!quiz1 || !quiz2 || advancing) return;
+    const nextAttempts = quizAttempts + 1;
+    setQuizAttempts(nextAttempts);
+    const correct1 = quiz1 === QUIZ_Q1_ANSWER;
+    const correct2 = quiz2 === QUIZ_Q2_ANSWER;
+    if (!correct1 || !correct2) {
+      setQuizFeedback(
+        "오답이 있습니다. 위 설명을 다시 확인하고 답을 골라주세요."
+      );
+      return;
+    }
+    setQuizFeedback(null);
+    if (participantId) {
+      await saveEuthanasiaResponse(participantId, "quiz_q1", quiz1);
+      await saveEuthanasiaResponse(participantId, "quiz_q2", quiz2);
+      await saveEuthanasiaResponse(
+        participantId,
+        "quiz_attempts",
+        String(nextAttempts)
+      );
+    }
+    setStage(3);
+  };
+
+  const handleStage3Next = async () => {
+    if (preOpinion === null || preOpinionConfidence === null || advancing) return;
     setAdvancing(true);
     if (participantId) {
       await saveEuthanasiaResponse(
@@ -117,24 +255,35 @@ export default function ExperimentTwoPage() {
         "pre_opinion",
         String(preOpinion)
       );
+      await saveEuthanasiaResponse(
+        participantId,
+        "pre_opinion_confidence",
+        String(preOpinionConfidence)
+      );
     }
-    setStage(3);
+    setStage(4);
     setAdvancing(false);
   };
 
-  const handleStage3Next = () => {
+  const handleStage4Next = () => {
     if (!hasCommented) return;
-    setStage(4);
+    setStage(5);
   };
 
-  const handleStage4Next = async () => {
-    if (finalOpinion === null || advancing) return;
+  const handleStage5Next = async () => {
+    if (finalOpinion === null || finalOpinionConfidence === null || advancing)
+      return;
     setAdvancing(true);
     if (participantId) {
       await saveEuthanasiaResponse(
         participantId,
         "final_opinion",
         String(finalOpinion)
+      );
+      await saveEuthanasiaResponse(
+        participantId,
+        "final_opinion_confidence",
+        String(finalOpinionConfidence)
       );
       if (preOpinion !== null) {
         await saveEuthanasiaResponse(
@@ -156,7 +305,7 @@ export default function ExperimentTwoPage() {
     <PageWrapper currentStep="experiment-2" maxWidth="lg">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-900">본실험 2</h1>
-        <span className="text-xs text-gray-500">단계 {stage} / 4</span>
+        <span className="text-xs text-gray-500">단계 {stage} / 5</span>
       </div>
 
       {stage === 1 && (
@@ -204,16 +353,73 @@ export default function ExperimentTwoPage() {
       {stage === 2 && (
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            평소 본인의 생각은 어떠신가요?
+            확인 퀴즈
           </h2>
           <p className="text-sm text-gray-600 mb-6">
-            <strong>조력 존엄사(적극적 존엄사) 합법화</strong>에 대해 평소
-            본인이 어떻게 생각해왔는지 가장 가까운 것을 선택해주세요.
+            앞 페이지의 설명을 바탕으로 두 문항 모두 정답을 골라주세요. 두 문항이
+            모두 맞아야 다음으로 넘어갈 수 있습니다.
+          </p>
+
+          <QuizQuestion
+            label="1"
+            question="조력 존엄사(적극적 존엄사)는 한국에서 현재 어떻게 다뤄지고 있나요?"
+            options={QUIZ_Q1_OPTIONS}
+            value={quiz1}
+            onChange={(v) => {
+              setQuiz1(v);
+              setQuizFeedback(null);
+            }}
+          />
+          <QuizQuestion
+            label="2"
+            question="다음 중 소극적 존엄사(연명의료 중단)에 해당하는 것은 무엇인가요?"
+            options={QUIZ_Q2_OPTIONS}
+            value={quiz2}
+            onChange={(v) => {
+              setQuiz2(v);
+              setQuizFeedback(null);
+            }}
+          />
+
+          {quizFeedback && (
+            <p className="mb-4 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+              {quizFeedback}
+            </p>
+          )}
+
+          <button
+            onClick={handleQuizSubmit}
+            disabled={!quiz1 || !quiz2 || advancing}
+            className="mt-2 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+          >
+            제출
+          </button>
+        </section>
+      )}
+
+      {stage === 3 && (
+        <section>
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">
+            존엄사에 대한 본인의 의견을 선택해주세요.
+          </h2>
+          <p className="text-sm text-gray-600 mb-6">
+            <strong>존엄사 합법화</strong>에 대한 본인의 생각·의견과 가장 가까운
+            것을 선택해주세요.
           </p>
           <LikertScale value={preOpinion} onChange={setPreOpinion} />
+          {preOpinion !== null && (
+            <ConfidenceScale
+              value={preOpinionConfidence}
+              onChange={setPreOpinionConfidence}
+            />
+          )}
           <button
-            onClick={handleStage2Next}
-            disabled={preOpinion === null || advancing}
+            onClick={handleStage3Next}
+            disabled={
+              preOpinion === null ||
+              preOpinionConfidence === null ||
+              advancing
+            }
             className="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             {advancing ? "저장 중…" : "다음"}
@@ -221,21 +427,21 @@ export default function ExperimentTwoPage() {
         </section>
       )}
 
-      {stage === 3 && (
+      {stage === 4 && (
         <section>
           <RedditPost
             subreddit="ethicsdebate"
             postedBy="thinking_alone"
             postedAgo="6시간 전"
-            title="Brittany Maynard 영상 봤는데… 존엄사에 대해 다들 어떻게 생각함?"
+            title="존엄사 관련 쇼츠 봤는데… 다들 어떻게 생각함?"
             score={342}
             commentCount={comments.length}
           >
-            <div className="mb-4 aspect-video w-full overflow-hidden rounded-md border border-gray-200 bg-black">
+            <div className="mb-4 mx-auto aspect-[9/16] w-full max-w-xs overflow-hidden rounded-md border border-gray-200 bg-black">
               <iframe
                 className="h-full w-full"
-                src="https://www.youtube.com/embed/yPfe3rCcUeQ"
-                title="Brittany Maynard"
+                src="https://www.youtube.com/embed/3Ai462Sg7X0"
+                title="존엄사 관련 영상"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
@@ -243,41 +449,41 @@ export default function ExperimentTwoPage() {
 
             <div className="space-y-3 text-gray-800 leading-relaxed">
               <p>
-                Brittany Maynard라고, 2014년에 미국에서 엄청 화제된 사람임. 결혼한
-                지 1년 좀 넘은 29살 신혼이었는데 어느 날 뇌종양 진단받음. 그것도
-                4등급 교모세포종, 시한부 6개월.
+                얼마 전에 우연히 본 쇼츠 하나가 계속 머릿속에 남아서 같이
+                이야기해보고 싶어 글 올려요.
               </p>
               <p>
-                근데 이 사람이 한 선택이 좀 충격적임. 호스피스 가서 발작이랑
-                두통 점점 심해지면서 의식 흐려져 죽느니, 정신 멀쩡할 때 가족들
-                옆에서 의사 처방받은 약 먹고 가겠다고 함. 문제는 캘리포니아엔
-                그런 법이 없어서 일부러 오리건주로 이사까지 함.
+                영상에서는 한 의사가 이런 이야기를 하더라고요. 말기 환자에게는
+                평화로운 죽음을 선택할 권리가 있어야 한다고. 정신은 온전한데
+                극심한 고통을 겪는 환자들을 곁에서 직접 봐왔고, 그래서 존엄하게
+                죽음을 맞이할 권리를 지지한다고요.
               </p>
               <p>
-                영상에서 본인이 직접 말함. &quot;나는 자살하고 싶은 게 아니다.
-                살고 싶지만 그게 불가능하다. 어떻게 죽을지는 내가 정하고 싶다&quot;고.
+                영상에서 그리는 &lsquo;존엄한 죽음&rsquo;의 모습은 이래요. 사랑하는
+                사람들이 곁에 있고, 좋아하던 음악을 들으며, 함께 음식을 나누고
+                추억을 이야기하다가 평화롭게 작별 인사를 하는 것.
               </p>
               <p>
-                남편이랑 그랜드캐니언 가는 장면, 강아지랑 노는 일상 같은 거 나오는데…
-                6분짜리인데 다 보고 나면 좀 멍해짐. 결국 2014년 11월 1일에 집에서
-                가족들 옆에서 떠남.
+                영상만 보면 &ldquo;당연히 그래야지&rdquo; 싶다가도, 막상 생각해보니
+                단순하지 않더라고요.
               </p>
               <p>
-                이 영상 하나 때문에 미국에서 존엄사 법 만든 주가 줄줄이 늘었다고 함.
-              </p>
-              <p>근데 보면서 솔직히 머리가 복잡해짐.</p>
-              <p>
-                &quot;고통 없이 갈 권리&quot;는 당연한 것 같다가도, 막상 한국에서
-                이게 합법화된다 생각하면 또 좀 무서움. 우리나라는 지금 연명치료
-                중단까지만 되고 약물 처방 같은 건 아예 안 되거든.
+                정말로 &lsquo;본인의 선택&rsquo;이라는 게 가능할까요? 가족에게
+                부담 주기 싫어서, 치료비가 무서워서 선택하는 거라면 그것도
+                자유의지일까?
               </p>
               <p>
-                병들고 늙은 부모님 둔 사람들 입장에선 또 다르게 느껴질 것 같고,
-                장애인 단체에서 반대하는 이유도 이해는 가고…
+                의사가 죽음을 돕는 게 의료의 본분과 충돌하지는 않을까?
+              </p>
+              <p>
+                반대로, 회복 가능성이 전혀 없고 고통만 남은 상황에서
+                &lsquo;살아라&rsquo;라고 하는 것이 더 잔인한 건 아닐까?
+              </p>
+              <p>
+                만약 우리 가족, 혹은 내 일이라면 어떤 선택을 하게 될까?
               </p>
               <p className="font-medium text-gray-900">
-                다들 존엄사에 대해 어떻게 생각함? 본인이 저 상황이면 어떤 선택
-                할 것 같음?
+                여러분은 어떻게 생각하세요? 찬성/반대 어느 쪽이든 이유가 궁금해요.
               </p>
             </div>
           </RedditPost>
@@ -298,7 +504,7 @@ export default function ExperimentTwoPage() {
           )}
 
           <button
-            onClick={handleStage3Next}
+            onClick={handleStage4Next}
             disabled={!hasCommented}
             className="mt-4 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
@@ -307,19 +513,29 @@ export default function ExperimentTwoPage() {
         </section>
       )}
 
-      {stage === 4 && (
+      {stage === 5 && (
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mb-2">
             다시 한 번 본인의 생각을 골라주세요
           </h2>
           <p className="text-sm text-gray-600 mb-6">
-            방금 댓글들을 보고 난 뒤, 조력 존엄사 합법화에 대한 본인의 생각을
-            다시 선택해주세요. 의견을 바꿔도 좋고, 그대로 유지해도 좋습니다.
+            방금 댓글들을 보고 난 뒤, 존엄사 합법화에 대한 본인의 생각을 다시
+            선택해주세요. 의견을 바꿔도 좋고, 그대로 유지해도 좋습니다.
           </p>
           <LikertScale value={finalOpinion} onChange={setFinalOpinion} />
+          {finalOpinion !== null && (
+            <ConfidenceScale
+              value={finalOpinionConfidence}
+              onChange={setFinalOpinionConfidence}
+            />
+          )}
           <button
-            onClick={handleStage4Next}
-            disabled={finalOpinion === null || advancing}
+            onClick={handleStage5Next}
+            disabled={
+              finalOpinion === null ||
+              finalOpinionConfidence === null ||
+              advancing
+            }
             className="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             {advancing ? "저장 중…" : "다음 (사후 설문)"}

@@ -200,6 +200,11 @@ export default function SurveyForm({
                   {q.section}
                 </h3>
               )}
+              {q.precedingNotice && (
+                <div className="mt-6 mb-4 rounded-lg bg-gray-100 px-4 py-3 text-sm text-gray-700 leading-relaxed">
+                  {q.precedingNotice}
+                </div>
+              )}
               {questionNode}
             </div>
           );

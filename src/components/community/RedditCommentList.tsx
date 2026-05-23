@@ -74,19 +74,18 @@ export default function RedditCommentList({
         <span className="text-xs text-gray-400">Sort by: Best</span>
       </div>
 
-      {showInput && (
-        <div className="my-4">
-          <RedditCommentInput
-            onSubmit={handleSubmit}
-            isSubmitting={isSubmitting}
-            placeholder={inputPlaceholder}
-            buttonLabel={inputButtonLabel}
-            minLength={inputMinLength}
-          />
-        </div>
-      )}
-
       <div className="divide-y divide-gray-100">
+        {presetComments.map((c) => (
+          <RedditCommentItem
+            key={c.id}
+            author={c.author}
+            content={c.content}
+            timeAgo={c.timeAgo}
+            score={c.likes}
+            showAiLabel={showAiLabel && c.isAiGenerated}
+          />
+        ))}
+
         {userComments.map((c) => (
           <RedditCommentItem
             key={c.id}
@@ -98,18 +97,19 @@ export default function RedditCommentList({
             isCurrentUser
           />
         ))}
-
-        {presetComments.map((c) => (
-          <RedditCommentItem
-            key={c.id}
-            author={c.author}
-            content={c.content}
-            timeAgo={c.timeAgo}
-            score={c.likes}
-            showAiLabel={showAiLabel && c.isAiGenerated}
-          />
-        ))}
       </div>
+
+      {showInput && (
+        <div className="mt-6 pt-4 border-t border-gray-200">
+          <RedditCommentInput
+            onSubmit={handleSubmit}
+            isSubmitting={isSubmitting}
+            placeholder={inputPlaceholder}
+            buttonLabel={inputButtonLabel}
+            minLength={inputMinLength}
+          />
+        </div>
+      )}
     </section>
   );
 }

@@ -75,11 +75,12 @@ const TEMPLATES: Template[] = [
 
 /**
  * AI 합의 답안을 산출.
- * 정답은 B이지만 AI들은 항상 user의 선택과 다른 하나의 라벨로 통일된 의견을 보냄.
- * 규칙: userChoice !== "C" 이면 "C", userChoice === "C" 이면 "A".
+ * 정답은 B. 매핑: A→B, B→C, C→B.
+ * 참가자가 정답(B)을 골랐을 때는 AI가 오답(C)으로 동조 압력을 가하고,
+ * 오답(A 또는 C)을 골랐을 때는 AI가 정답(B)으로 교정 압력을 가함.
  */
 export function computeAiClaim(userChoice: AschLineLabel): AschLineLabel {
-  return userChoice === "C" ? "A" : "C";
+  return userChoice === "B" ? "C" : "B";
 }
 
 export function buildAschComments(

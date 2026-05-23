@@ -35,6 +35,45 @@ async function saveAschResponse(
   }
 }
 
+function ConfidenceScale({
+  value,
+  onChange,
+}: {
+  value: number | null;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
+      <p className="text-sm font-medium text-gray-800 mb-3">
+        본인의 선택에 얼마나 확신하십니까?
+      </p>
+      <div className="grid grid-cols-7 gap-1.5">
+        {Array.from({ length: 7 }, (_, i) => i + 1).map((score) => {
+          const selected = value === score;
+          return (
+            <button
+              key={score}
+              type="button"
+              onClick={() => onChange(score)}
+              className={`flex h-9 items-center justify-center rounded-md border text-sm font-semibold transition-colors ${
+                selected
+                  ? "border-blue-600 bg-blue-600 text-white"
+                  : "border-gray-300 bg-white text-gray-600 hover:border-gray-400"
+              }`}
+            >
+              {score}
+            </button>
+          );
+        })}
+      </div>
+      <div className="mt-2 flex justify-between text-[11px] text-gray-500">
+        <span>1 = 전혀 확신 안 함</span>
+        <span>7 = 매우 확신함</span>
+      </div>
+    </div>
+  );
+}
+
 export default function ExperimentPage() {
   const router = useRouter();
   const { participantId, commentCount, hasAiLabel, isReady } =
@@ -48,6 +87,8 @@ export default function ExperimentPage() {
   const [hasCommented, setHasCommented] = useState(false);
   const [advancing, setAdvancing] = useState(false);
   const [stage1Remaining, setStage1Remaining] = useState(STAGE1_SECONDS);
+  const [preConfidence, setPreConfidence] = useState<number | null>(null);
+  const [finalConfidence, setFinalConfidence] = useState<number | null>(null);
 
   // 단계 1: 기준 선분 STAGE1_SECONDS초 노출 후 자동으로 단계 2로 이동
   useEffect(() => {
@@ -74,7 +115,7 @@ export default function ExperimentPage() {
   }
 
   const handleStage2Next = async () => {
-    if (!stageSelection || advancing) return;
+    if (!stageSelection || preConfidence === null || advancing) return;
     setAdvancing(true);
     const choice = stageSelection;
     const claim = computeAiClaim(choice);
@@ -88,6 +129,11 @@ export default function ExperimentPage() {
         "correct_answer",
         ASCH_CORRECT_ANSWER
       );
+      await saveAschResponse(
+        participantId,
+        "pre_confidence",
+        String(preConfidence)
+      );
     }
     setStageSelection(null);
     setStage(3);
@@ -100,11 +146,16 @@ export default function ExperimentPage() {
   };
 
   const handleStage4Next = async () => {
-    if (!stageSelection || advancing) return;
+    if (!stageSelection || finalConfidence === null || advancing) return;
     setAdvancing(true);
     const final = stageSelection;
     if (participantId) {
       await saveAschResponse(participantId, "final_choice", final);
+      await saveAschResponse(
+        participantId,
+        "final_confidence",
+        String(finalConfidence)
+      );
       const conformed =
         aiClaim && initialChoice && final === aiClaim && initialChoice !== aiClaim;
       await saveAschResponse(
@@ -166,9 +217,15 @@ export default function ExperimentPage() {
             selected={stageSelection}
             onSelect={setStageSelection}
           />
+          {stageSelection && (
+            <ConfidenceScale
+              value={preConfidence}
+              onChange={setPreConfidence}
+            />
+          )}
           <button
             onClick={handleStage2Next}
-            disabled={!stageSelection || advancing}
+            disabled={!stageSelection || preConfidence === null || advancing}
             className="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             {advancing ? "저장 중…" : "다음"}
@@ -233,9 +290,15 @@ export default function ExperimentPage() {
             selected={stageSelection}
             onSelect={setStageSelection}
           />
+          {stageSelection && (
+            <ConfidenceScale
+              value={finalConfidence}
+              onChange={setFinalConfidence}
+            />
+          )}
           <button
             onClick={handleStage4Next}
-            disabled={!stageSelection || advancing}
+            disabled={!stageSelection || finalConfidence === null || advancing}
             className="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             {advancing ? "저장 중…" : "다음 (본실험2)"}

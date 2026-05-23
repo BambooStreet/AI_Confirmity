@@ -36,11 +36,6 @@ export default function RedditCommentItem({
       <div className="flex-1 min-w-0">
         <div className="flex flex-wrap items-center gap-x-2 text-xs">
           <span className="font-bold text-gray-900">u/{author}</span>
-          {showAiLabel && (
-            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700 border border-purple-200">
-              AI
-            </span>
-          )}
           {isCurrentUser && (
             <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 border border-blue-200">
               OP
@@ -51,6 +46,11 @@ export default function RedditCommentItem({
         </div>
 
         <p className="text-sm text-gray-800 leading-relaxed mt-1 whitespace-pre-wrap">
+          {showAiLabel && (
+            <span className="inline-flex items-center align-middle mr-1.5 px-1.5 py-0.5 rounded text-[11px] font-bold bg-purple-600 text-white">
+              AI
+            </span>
+          )}
           {content}
         </p>
 
