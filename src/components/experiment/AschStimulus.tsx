@@ -5,6 +5,7 @@ export type AschLineLabel = "A" | "B" | "C";
 export const ASCH_LABELS: AschLineLabel[] = ["A", "B", "C"];
 
 // 기준선과 동일한 길이는 B. A는 짧고 C는 김 → 정답은 B.
+// 값은 픽셀이 아니라 비율의 기준(가장 긴 값 = 100%)으로 쓰인다.
 export const ASCH_LENGTHS: Record<AschLineLabel, number> = {
   A: 180,
   B: 280,
@@ -13,6 +14,11 @@ export const ASCH_LENGTHS: Record<AschLineLabel, number> = {
 
 export const ASCH_REFERENCE_LENGTH = 280;
 export const ASCH_CORRECT_ANSWER: AschLineLabel = "B";
+
+const ASCH_MAX_LENGTH = Math.max(
+  ASCH_REFERENCE_LENGTH,
+  ...Object.values(ASCH_LENGTHS)
+);
 
 type AschStimulusProps = {
   selectable?: boolean;
@@ -63,11 +69,13 @@ function LineRow({
       >
         {label}
       </span>
-      <span
-        className="block h-1.5 bg-gray-900 rounded-sm"
-        style={{ width: `${length}px`, maxWidth: "100%" }}
-        aria-label={`line ${label}`}
-      />
+      <span className="flex-1 min-w-0 max-w-md">
+        <span
+          className="block h-1.5 bg-gray-900 rounded-sm"
+          style={{ width: `${(length / ASCH_MAX_LENGTH) * 100}%` }}
+          aria-label={`line ${label}`}
+        />
+      </span>
     </button>
   );
 }
@@ -93,11 +101,15 @@ export default function AschStimulus({
             <span className="text-base font-bold text-gray-900 w-6 shrink-0">
               ★
             </span>
-            <span
-              className="block h-1.5 bg-gray-900 rounded-sm"
-              style={{ width: `${ASCH_REFERENCE_LENGTH}px`, maxWidth: "100%" }}
-              aria-label="reference line"
-            />
+            <span className="flex-1 min-w-0 max-w-md">
+              <span
+                className="block h-1.5 bg-gray-900 rounded-sm"
+                style={{
+                  width: `${(ASCH_REFERENCE_LENGTH / ASCH_MAX_LENGTH) * 100}%`,
+                }}
+                aria-label="reference line"
+              />
+            </span>
           </div>
         </div>
       )}
