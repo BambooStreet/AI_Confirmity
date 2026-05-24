@@ -202,7 +202,7 @@ export const postSurveyQuestions: SurveyQuestion[] = [
   {
     id: "psc-1",
     question:
-      "방금 보신 댓글에 나타난 주장에 대해 전체의 몇 %가 동의할 것이라고 생각하나요?",
+      "존엄사 콘텐츠 댓글에 나타난 주장에 대해 전체의 몇 %가 동의할 것이라고 생각하나요?",
     type: "number",
     required: true,
     min: 0,
@@ -213,7 +213,7 @@ export const postSurveyQuestions: SurveyQuestion[] = [
   {
     id: "psc-2",
     question:
-      "다수의 사람들이 방금 보신 댓글에 나타난 주장에 대해 동의한다고 생각한다.",
+      "다수의 사람들이 존엄사 콘텐츠 댓글에 나타난 주장에 대해 동의한다고 생각한다.",
     type: "likert7",
     required: true,
     page: 1,
@@ -221,14 +221,14 @@ export const postSurveyQuestions: SurveyQuestion[] = [
   {
     id: "psc-3",
     question:
-      "나는 대부분의 사람들이 방금 보신 댓글에 나타난 주장을 공유하고 있다고 생각한다.",
+      "나는 대부분의 사람들이 존엄사 콘텐츠 댓글에 나타난 주장을 공유하고 있다고 생각한다.",
     type: "likert7",
     required: true,
     page: 1,
   },
   {
     id: "psc-4",
-    question: "방금 보신 댓글에 나타난 주장은 커뮤니티의 주류 의견이다.",
+    question: "존엄사 콘텐츠 댓글에 나타난 주장은 커뮤니티의 주류 의견이다.",
     type: "likert7",
     required: true,
     page: 1,
@@ -236,7 +236,7 @@ export const postSurveyQuestions: SurveyQuestion[] = [
   {
     id: "psc-5",
     question:
-      "커뮤니티 사람들은 방금 보신 댓글에 나타난 주장을 주변 사람들에게 공유할 것이다.",
+      "커뮤니티 사람들은 존엄사 콘텐츠 댓글에 나타난 주장을 주변 사람들에게 공유할 것이다.",
     type: "likert7",
     required: true,
     page: 1,
@@ -244,7 +244,7 @@ export const postSurveyQuestions: SurveyQuestion[] = [
   {
     id: "psc-6",
     question:
-      "커뮤니티 사람들은 방금 보신 댓글에 나타난 주장을 긍정적으로 평가할 것이다.",
+      "커뮤니티 사람들은 존엄사 콘텐츠 댓글에 나타난 주장을 긍정적으로 평가할 것이다.",
     type: "likert7",
     required: true,
     page: 1,
