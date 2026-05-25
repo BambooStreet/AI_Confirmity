@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import QuestionEditor from "@/components/admin/QuestionEditor";
 
 const PASSWORD_KEY = "admin_password_v1";
 
@@ -61,6 +62,7 @@ export default function AdminPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<ParticipantDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [tab, setTab] = useState<"sessions" | "questions">("sessions");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -204,14 +206,36 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
-        <h1 className="text-lg font-bold text-gray-900">관리자 — 세션 조회</h1>
+        <div className="flex items-center gap-4">
+          <h1 className="text-lg font-bold text-gray-900">관리자</h1>
+          <nav className="inline-flex rounded-md border border-gray-300 overflow-hidden">
+            <button
+              onClick={() => setTab("sessions")}
+              className={`px-3 py-1.5 text-sm ${
+                tab === "sessions" ? "bg-blue-600 text-white" : "bg-white text-gray-700"
+              }`}
+            >
+              세션 조회
+            </button>
+            <button
+              onClick={() => setTab("questions")}
+              className={`px-3 py-1.5 text-sm ${
+                tab === "questions" ? "bg-blue-600 text-white" : "bg-white text-gray-700"
+              }`}
+            >
+              문항 편집
+            </button>
+          </nav>
+        </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => void refreshList()}
-            className="text-xs px-3 py-1.5 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-          >
-            새로고침
-          </button>
+          {tab === "sessions" && (
+            <button
+              onClick={() => void refreshList()}
+              className="text-xs px-3 py-1.5 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+            >
+              새로고침
+            </button>
+          )}
           <button
             onClick={logout}
             className="text-xs px-3 py-1.5 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
@@ -221,13 +245,19 @@ export default function AdminPage() {
         </div>
       </header>
 
-      {error && (
-        <p className="bg-red-50 border-b border-red-200 px-6 py-2 text-sm text-red-700">
-          {error}
-        </p>
-      )}
+      {tab === "questions" ? (
+        <div className="p-6">
+          <QuestionEditor password={password} />
+        </div>
+      ) : (
+        <>
+          {error && (
+            <p className="bg-red-50 border-b border-red-200 px-6 py-2 text-sm text-red-700">
+              {error}
+            </p>
+          )}
 
-      <div className="flex" style={{ height: "calc(100vh - 49px)" }}>
+          <div className="flex" style={{ height: "calc(100vh - 49px)" }}>
         {/* 좌측 참가자 리스트 */}
         <aside className="w-96 border-r border-gray-200 bg-white overflow-y-auto">
           <div className="px-4 py-3 border-b border-gray-200 text-xs text-gray-500 sticky top-0 bg-white">
@@ -435,7 +465,9 @@ export default function AdminPage() {
             </div>
           )}
         </main>
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
