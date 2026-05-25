@@ -348,7 +348,7 @@ export const postSurveyQuestions: SurveyQuestion[] = [
   {
     id: "ac-1",
     question:
-      "당신이 이 주제에 대해 자신의 진정한 태도를 알고 있다는 점에 얼마나 확신합니까?",
+      "일반적으로, 자신이 주장하는 바에 대해 당신은 얼마나 확신합니까?",
     type: "likert7",
     required: true,
     page: 3,
@@ -358,7 +358,7 @@ export const postSurveyQuestions: SurveyQuestion[] = [
   {
     id: "ac-2",
     question:
-      "당신이 표현한 태도가 당신의 진정한 생각과 감정을 얼마나 잘 반영한다고 확신합니까?",
+      "일반적으로, 당신은 당신의 생각과 감정을 반영한 태도를 얼마나 잘 나타낸다고 생각하십니까?",
     type: "likert7",
     required: true,
     page: 3,
@@ -366,7 +366,7 @@ export const postSurveyQuestions: SurveyQuestion[] = [
   {
     id: "ac-3",
     question:
-      "이 주제에 대한 당신의 진정한 태도가 당신의 마음속에 얼마나 명확합니까?",
+      "일반적으로, 당신은 당신의 선택에 대해 얼마나 명료하게 느끼십니까?",
     type: "likert7",
     required: true,
     page: 3,
