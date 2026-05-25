@@ -156,6 +156,39 @@ export default function AdminPage() {
     URL.revokeObjectURL(url);
   }
 
+  const [exporting, setExporting] = useState(false);
+  const [showCsvHelp, setShowCsvHelp] = useState(false);
+  async function downloadAllCsv() {
+    setExporting(true);
+    setError(null);
+    try {
+      const res = await fetch(
+        `/api/admin/export?password=${encodeURIComponent(password)}`,
+        { cache: "no-store" }
+      );
+      if (!res.ok) {
+        setError(`CSV 다운로드 실패 (${res.status})`);
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const stamp = new Date()
+        .toISOString()
+        .slice(0, 16)
+        .replace(/[-:T]/g, "")
+        .replace(/(\d{8})(\d{4})/, "$1_$2");
+      a.download = `participants_${stamp}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setError("CSV 다운로드 중 네트워크 오류");
+    } finally {
+      setExporting(false);
+    }
+  }
+
   const responseGroups = useMemo(() => {
     if (!detail) return {} as Record<string, ResponseRow[]>;
     return groupBy(detail.responses, (r) => r.surveyType);
@@ -229,12 +262,29 @@ export default function AdminPage() {
         </div>
         <div className="flex items-center gap-2">
           {tab === "sessions" && (
-            <button
-              onClick={() => void refreshList()}
-              className="text-xs px-3 py-1.5 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-            >
-              새로고침
-            </button>
+            <>
+              <button
+                onClick={() => void downloadAllCsv()}
+                disabled={exporting}
+                className="text-xs px-3 py-1.5 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              >
+                {exporting ? "내보내는 중…" : "전체 CSV 다운로드"}
+              </button>
+              <button
+                onClick={() => setShowCsvHelp((v) => !v)}
+                className={`text-xs px-3 py-1.5 rounded border border-gray-300 hover:bg-gray-50 ${
+                  showCsvHelp ? "bg-gray-100 text-gray-800" : "bg-white text-gray-700"
+                }`}
+              >
+                {showCsvHelp ? "컬럼 설명 닫기" : "컬럼 설명"}
+              </button>
+              <button
+                onClick={() => void refreshList()}
+                className="text-xs px-3 py-1.5 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+              >
+                새로고침
+              </button>
+            </>
           )}
           <button
             onClick={logout}
@@ -255,6 +305,52 @@ export default function AdminPage() {
             <p className="bg-red-50 border-b border-red-200 px-6 py-2 text-sm text-red-700">
               {error}
             </p>
+          )}
+
+          {showCsvHelp && (
+            <div className="border-b border-gray-200 bg-amber-50 px-6 py-4 text-xs text-gray-700 leading-relaxed">
+              <p className="mb-2 font-semibold text-gray-800">
+                CSV 컬럼 설명 (참가자 1명 = 1행)
+              </p>
+              <div className="grid gap-x-8 gap-y-3 md:grid-cols-2">
+                <div>
+                  <p className="font-medium text-gray-800 mb-1">기본 정보</p>
+                  <ul className="space-y-0.5">
+                    <li><code className="text-gray-900">participant_id</code> — 참가자 고유 ID</li>
+                    <li><code className="text-gray-900">condition</code> — 실험 조건 (예: <code>ai_10</code> = AI 라벨 표시 + 댓글 10개, <code>no_ai_5</code> = 라벨 없음 + 5개)</li>
+                    <li><code className="text-gray-900">consent</code> — 동의 여부 (Y/N)</li>
+                    <li><code className="text-gray-900">current_step</code> — 도달한 단계</li>
+                    <li><code className="text-gray-900">completed</code> — 사후설문까지 완료 여부 (Y/N)</li>
+                    <li><code className="text-gray-900">started_at / completed_at</code> — 시작/완료 시각 (UTC)</li>
+                    <li><code className="text-gray-900">n_responses / n_comments</code> — 응답·작성 댓글 개수</li>
+                  </ul>
+                  <p className="font-medium text-gray-800 mt-3 mb-1">컬럼 이름 규칙</p>
+                  <ul className="space-y-0.5">
+                    <li><code className="text-gray-900">설문종류__질문ID</code> 형식 (예: <code>pre__demo-age</code>, <code>post__ac-1</code>)</li>
+                    <li><code>pre</code> 사전설문 · <code>post</code> 사후설문 · <code>asch</code> 본실험1(선분) · <code>euthanasia</code> 본실험2(존엄사)</li>
+                    <li><code className="text-gray-900">comment_1~3</code> — 참가자가 실험 중 직접 작성한 댓글</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-medium text-gray-800 mb-1">본실험1 (asch__)</p>
+                  <ul className="space-y-0.5">
+                    <li><code className="text-gray-900">initial_choice</code> — 처음 고른 선분</li>
+                    <li><code className="text-gray-900">ai_claim</code> — AI/댓글이 주장한(보여준) 선분</li>
+                    <li><code className="text-gray-900">correct_answer</code> — 실제 정답 선분</li>
+                    <li><code className="text-gray-900">pre_confidence / final_confidence</code> — 처치 전/후 확신도</li>
+                    <li><code className="text-gray-900">final_choice</code> — 마지막에 고른 선분</li>
+                    <li><code className="text-gray-900">conformed</code> — 동조 여부 (true = 안 골랐던 AI 주장으로 변경)</li>
+                  </ul>
+                  <p className="font-medium text-gray-800 mt-3 mb-1">본실험2 (euthanasia__)</p>
+                  <ul className="space-y-0.5">
+                    <li><code className="text-gray-900">quiz_attempts</code> — 사전 퀴즈 시도 횟수</li>
+                    <li><code className="text-gray-900">pre_opinion / final_opinion</code> — 처치 전/후 의견 (1~7)</li>
+                    <li><code className="text-gray-900">pre_opinion_confidence / final_opinion_confidence</code> — 각 확신도</li>
+                    <li><code className="text-gray-900">opinion_shift</code> — 의견 변화량 (final − pre)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           )}
 
           <div className="flex" style={{ height: "calc(100vh - 49px)" }}>
