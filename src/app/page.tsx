@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import {
   isValidCondition,
   VALID_CONDITIONS,
@@ -57,16 +57,48 @@ function LandingContent() {
   const [mode, setMode] = useState<"loading" | "select">(() =>
     validUrlCondition ? "loading" : "select"
   );
-  const [selected, setSelected] = useState<ConditionKey>(VALID_CONDITIONS[0]);
+  const [selected, setSelected] = useState<ConditionKey>(
+    (validUrlCondition as ConditionKey | null) ?? VALID_CONDITIONS[0]
+  );
   const [submitting, setSubmitting] = useState(false);
+  const [origin, setOrigin] = useState("");
+  const [copied, setCopied] = useState(false);
+  const didStart = useRef(false);
 
   useEffect(() => {
-    if (!validUrlCondition) return;
+    setOrigin(window.location.origin);
+  }, []);
+
+  // 최초 진입 시 URL에 유효한 condition이 있을 때만 자동 시작(참가자 링크).
+  // 연구자가 아래에서 그룹을 고르며 URL만 바꾸는 경우엔 시작되지 않는다.
+  useEffect(() => {
+    if (didStart.current || !validUrlCondition) return;
+    didStart.current = true;
     startParticipant(validUrlCondition, router, (msg) => {
       setError(msg);
       setMode("select");
     });
-  }, [validUrlCondition, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const linkFor = (c: ConditionKey) => `${origin}/?condition=${c}`;
+
+  // 그룹 선택 시 주소창 URL을 그 그룹용으로 바꾼다(자동 시작은 트리거하지 않음).
+  const handleSelectChange = (value: ConditionKey) => {
+    setSelected(value);
+    setCopied(false);
+    router.replace(`/?condition=${value}`, { scroll: false });
+  };
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(linkFor(selected));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setError("복사에 실패했습니다. 링크를 직접 선택해 복사해주세요.");
+    }
+  };
 
   if (mode === "loading") {
     return (
@@ -106,7 +138,7 @@ function LandingContent() {
         <select
           id="condition-select"
           value={selected}
-          onChange={(e) => setSelected(e.target.value as ConditionKey)}
+          onChange={(e) => handleSelectChange(e.target.value as ConditionKey)}
           disabled={submitting}
           className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-60"
         >
@@ -141,9 +173,29 @@ function LandingContent() {
           {submitting ? "준비 중..." : "실험 시작"}
         </button>
 
-        <p className="mt-4 text-xs text-gray-400 text-center">
-          URL 쿼리로도 진입 가능: /?condition=ai_5
-        </p>
+        <div className="mt-6 border-t border-gray-200 pt-4">
+          <label className="block text-xs font-medium text-gray-500 mb-1">
+            이 그룹 참가자 배포 링크
+          </label>
+          <div className="flex gap-2">
+            <input
+              readOnly
+              value={origin ? linkFor(selected) : ""}
+              onFocus={(e) => e.currentTarget.select()}
+              className="flex-1 border border-gray-300 rounded-md px-2 py-1.5 text-xs text-gray-700 bg-gray-50 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              type="button"
+              onClick={copyLink}
+              className="text-xs px-3 py-1.5 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 whitespace-nowrap"
+            >
+              {copied ? "복사됨" : "복사"}
+            </button>
+          </div>
+          <p className="mt-2 text-[11px] text-gray-400">
+            참가자가 이 링크로 들어오면 해당 그룹으로 자동 시작됩니다.
+          </p>
+        </div>
       </div>
     </div>
   );
