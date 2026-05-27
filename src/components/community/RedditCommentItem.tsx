@@ -45,12 +45,14 @@ export default function RedditCommentItem({
           <span className="text-gray-500">{timeAgo}</span>
         </div>
 
+        {showAiLabel && (
+          <p className="flex items-center gap-1 mt-1 text-[11px] font-semibold text-red-600">
+            <span aria-hidden>🤖</span>
+            AI가 작성한 댓글입니다
+          </p>
+        )}
+
         <p className="text-sm text-gray-800 leading-relaxed mt-1 whitespace-pre-wrap">
-          {showAiLabel && (
-            <span className="inline-flex items-center align-middle mr-1.5 px-1.5 py-0.5 rounded text-[11px] font-bold bg-purple-600 text-white">
-              AI
-            </span>
-          )}
           {content}
         </p>
 
