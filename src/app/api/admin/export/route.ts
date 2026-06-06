@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { checkAdminAuth } from "@/lib/admin-auth";
+import { isPhase } from "@/lib/phases";
 
 // surveyType 컬럼 정렬 우선순위 (그 외 타입은 뒤에 알파벳순으로 붙는다)
 const SURVEY_ORDER = ["pre", "asch", "euthanasia", "post"];
@@ -25,7 +26,12 @@ export async function GET(request: NextRequest) {
     });
   }
 
+  // ?phase=test|pilot|main 으로 특정 단계만 내보내기 (없으면 전체)
+  const phaseParam = new URL(request.url).searchParams.get("phase");
+  const phase = isPhase(phaseParam) ? phaseParam : null;
+
   const participants = await prisma.participant.findMany({
+    where: phase ? { phase } : undefined,
     orderBy: { startedAt: "asc" },
     include: {
       responses: { orderBy: { createdAt: "asc" } },
@@ -61,6 +67,9 @@ export async function GET(request: NextRequest) {
   // 2) 헤더
   const meta = [
     "participant_id",
+    "phase",
+    "external_id",
+    "external_meta",
     "condition",
     "consent",
     "current_step",
@@ -84,6 +93,9 @@ export async function GET(request: NextRequest) {
 
     const row: (string | number)[] = [
       p.id,
+      p.phase,
+      p.externalId ?? "",
+      p.externalMeta ? JSON.stringify(p.externalMeta) : "",
       p.condition,
       p.consent ? "Y" : "N",
       p.currentStep,
@@ -107,11 +119,12 @@ export async function GET(request: NextRequest) {
     now.getMinutes()
   ).padStart(2, "0")}`;
 
+  const filePrefix = phase ? `participants_${phase}` : "participants_all";
   return new Response(csv, {
     status: 200,
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="participants_${stamp}.csv"`,
+      "Content-Disposition": `attachment; filename="${filePrefix}_${stamp}.csv"`,
       "Cache-Control": "no-store",
     },
   });

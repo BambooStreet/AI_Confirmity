@@ -8,14 +8,28 @@ datasource db {
 }
 
 model Participant {
-  id          String    @id @default(cuid())
-  condition   String
-  startedAt   DateTime  @default(now())
-  completedAt DateTime?
-  consent     Boolean   @default(false)
-  currentStep Int       @default(0)
-  responses   Response[]
-  comments    Comment[]
+  id           String    @id @default(cuid())
+  condition    String
+  // 외부 패널(CloudResearch 등) 참가자 식별자 — 진입 URL 쿼리에서 추출. 재진입 시 중복 생성 방지용 unique.
+  externalId   String?   @unique
+  // 진입 URL 쿼리스트링 전체 (플랫폼·설정에 따라 키 이름이 달라질 수 있어 통째로 보존)
+  externalMeta Json?
+  // 실험 단계: "test"(내부 테스트) | "pilot" | "main"(본실험). 생성 시점의 전역 설정값이 기록된다.
+  // default "test" — 기존 데이터 백필 겸, 설정을 깜빡해도 본실험 데이터가 오염되지 않는 안전한 기본값.
+  phase        String    @default("test")
+  startedAt    DateTime  @default(now())
+  completedAt  DateTime?
+  consent      Boolean   @default(false)
+  currentStep  Int       @default(0)
+  responses    Response[]
+  comments     Comment[]
+}
+
+// 전역 키-값 설정 (예: currentPhase — 새 참가자에게 찍히는 현재 실험 단계)
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
 }
 
 model Response {

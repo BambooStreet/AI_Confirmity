@@ -16,21 +16,53 @@ function describeCondition(key: ConditionKey): string {
 const AI_GROUP = VALID_CONDITIONS.filter((k) => k.startsWith("ai_"));
 const NO_AI_GROUP = VALID_CONDITIONS.filter((k) => k.startsWith("no_ai_"));
 
+// 외부 패널(CloudResearch 등)이 URL에 붙여 보내는 참가자 식별자 후보 키.
+// 플랫폼·설정에 따라 키 이름이 달라 우선순위대로 모두 체크한다.
+const EXTERNAL_ID_KEYS = ["participantId", "workerId", "assignmentId", "hitId"];
+
+type ExternalInfo = {
+  externalId: string | null;
+  externalMeta: Record<string, string> | null;
+  // 연구자 확인용: URL에 phase=test가 있으면 전역 단계 설정과 무관하게 test로 기록
+  phase: string | null;
+};
+
+// 진입 URL의 쿼리스트링 전체를 보존하고, 후보 키 중 첫 번째로 값이 있는 것을 식별자로 추출한다.
+function extractExternalInfo(
+  searchParams: ReturnType<typeof useSearchParams>
+): ExternalInfo {
+  const meta: Record<string, string> = {};
+  for (const [key, value] of searchParams.entries()) meta[key] = value;
+  const idKey = EXTERNAL_ID_KEYS.find((k) => meta[k]?.trim());
+  return {
+    externalId: idKey ? meta[idKey].trim() : null,
+    externalMeta: Object.keys(meta).length > 0 ? meta : null,
+    phase: searchParams.get("phase"),
+  };
+}
+
 function startParticipant(
   condition: ConditionKey,
+  external: ExternalInfo,
   router: ReturnType<typeof useRouter>,
   onError: (msg: string) => void
 ) {
   fetch("/api/participants", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ condition }),
+    body: JSON.stringify({
+      condition,
+      externalId: external.externalId,
+      externalMeta: external.externalMeta,
+      phase: external.phase,
+    }),
   })
     .then((res) => res.json())
     .then((data) => {
       if (data.id) {
         localStorage.setItem("participantId", data.id);
-        localStorage.setItem("condition", condition);
+        // 재진입으로 기존 참가자가 반환되면 그쪽 condition을 따른다.
+        localStorage.setItem("condition", data.condition ?? condition);
         router.push("/consent");
       } else {
         onError("참가자 등록 중 오류가 발생했습니다.");
@@ -74,10 +106,15 @@ function LandingContent() {
   useEffect(() => {
     if (didStart.current || !validUrlCondition) return;
     didStart.current = true;
-    startParticipant(validUrlCondition, router, (msg) => {
-      setError(msg);
-      setMode("select");
-    });
+    startParticipant(
+      validUrlCondition,
+      extractExternalInfo(searchParams),
+      router,
+      (msg) => {
+        setError(msg);
+        setMode("select");
+      }
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -115,7 +152,7 @@ function LandingContent() {
     if (submitting) return;
     setSubmitting(true);
     setError(null);
-    startParticipant(selected, router, (msg) => {
+    startParticipant(selected, extractExternalInfo(searchParams), router, (msg) => {
       setError(msg);
       setSubmitting(false);
     });

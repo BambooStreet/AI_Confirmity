@@ -2,18 +2,31 @@
 
 import { useEffect, useMemo, useState } from "react";
 import QuestionEditor from "@/components/admin/QuestionEditor";
+import { PHASES, PHASE_LABELS, isPhase, type Phase } from "@/lib/phases";
 
 const PASSWORD_KEY = "admin_password_v1";
 
 type ParticipantSummary = {
   id: string;
   condition: string;
+  phase: string;
+  externalId: string | null;
   startedAt: string;
   completedAt: string | null;
   consent: boolean;
   currentStep: number;
   _count: { responses: number; comments: number };
 };
+
+const PHASE_BADGE_STYLES: Record<string, string> = {
+  test: "bg-gray-100 text-gray-600",
+  pilot: "bg-purple-100 text-purple-700",
+  main: "bg-blue-100 text-blue-700",
+};
+
+function phaseLabel(phase: string): string {
+  return isPhase(phase) ? PHASE_LABELS[phase] : phase;
+}
 
 type ResponseRow = {
   id: string;
@@ -63,6 +76,12 @@ export default function AdminPage() {
   const [detail, setDetail] = useState<ParticipantDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [tab, setTab] = useState<"sessions" | "questions">("sessions");
+  // 새 참가자에게 찍히는 전역 단계 설정
+  const [currentPhase, setCurrentPhase] = useState<Phase | null>(null);
+  const [phaseDraft, setPhaseDraft] = useState<Phase>("test");
+  const [phaseSaving, setPhaseSaving] = useState(false);
+  // 목록·CSV 필터
+  const [phaseFilter, setPhaseFilter] = useState<"all" | Phase>("all");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -97,10 +116,89 @@ export default function AdminPage() {
       setPassword(pw);
       sessionStorage.setItem(PASSWORD_KEY, pw);
       setAuthed(true);
+      void loadPhase(pw);
     } catch {
       setError("네트워크 오류가 발생했습니다.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadPhase(pw: string) {
+    try {
+      const res = await fetch(
+        `/api/admin/phase?password=${encodeURIComponent(pw)}`,
+        { cache: "no-store" }
+      );
+      if (!res.ok) return;
+      const data = (await res.json()) as { phase: Phase };
+      setCurrentPhase(data.phase);
+      setPhaseDraft(data.phase);
+    } catch {
+      // 단계 조회 실패는 치명적이지 않음 — 표시만 비워둔다
+    }
+  }
+
+  // 개별 참가자 단계 재분류 (예: 파일럿 중 확인차 들어간 세션을 test로)
+  async function changeParticipantPhase(id: string, phase: Phase) {
+    if (
+      !window.confirm(
+        `이 참가자의 단계를 "${PHASE_LABELS[phase]}"(으)로 변경할까요?`
+      )
+    ) {
+      return;
+    }
+    setError(null);
+    try {
+      const res = await fetch(
+        `/api/admin/sessions?password=${encodeURIComponent(password)}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, phase }),
+        }
+      );
+      if (!res.ok) {
+        setError(`단계 변경 실패 (${res.status})`);
+        return;
+      }
+      setDetail((d) => (d && d.id === id ? { ...d, phase } : d));
+      setList((l) => l.map((p) => (p.id === id ? { ...p, phase } : p)));
+    } catch {
+      setError("단계 변경 중 네트워크 오류");
+    }
+  }
+
+  async function savePhase() {
+    if (phaseSaving || phaseDraft === currentPhase) return;
+    if (
+      !window.confirm(
+        `현재 실험 단계를 "${PHASE_LABELS[phaseDraft]}"(으)로 변경할까요?\n이후 새로 들어오는 참가자에게 이 단계가 기록됩니다.`
+      )
+    ) {
+      return;
+    }
+    setPhaseSaving(true);
+    setError(null);
+    try {
+      const res = await fetch(
+        `/api/admin/phase?password=${encodeURIComponent(password)}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phase: phaseDraft }),
+        }
+      );
+      if (!res.ok) {
+        setError(`단계 변경 실패 (${res.status})`);
+        return;
+      }
+      const data = (await res.json()) as { phase: Phase };
+      setCurrentPhase(data.phase);
+    } catch {
+      setError("단계 변경 중 네트워크 오류");
+    } finally {
+      setPhaseSaving(false);
     }
   }
 
@@ -162,8 +260,10 @@ export default function AdminPage() {
     setExporting(true);
     setError(null);
     try {
+      const phaseQuery =
+        phaseFilter === "all" ? "" : `&phase=${encodeURIComponent(phaseFilter)}`;
       const res = await fetch(
-        `/api/admin/export?password=${encodeURIComponent(password)}`,
+        `/api/admin/export?password=${encodeURIComponent(password)}${phaseQuery}`,
         { cache: "no-store" }
       );
       if (!res.ok) {
@@ -179,7 +279,7 @@ export default function AdminPage() {
         .slice(0, 16)
         .replace(/[-:T]/g, "")
         .replace(/(\d{8})(\d{4})/, "$1_$2");
-      a.download = `participants_${stamp}.csv`;
+      a.download = `participants_${phaseFilter}_${stamp}.csv`;
       a.click();
       URL.revokeObjectURL(url);
     } catch {
@@ -188,6 +288,19 @@ export default function AdminPage() {
       setExporting(false);
     }
   }
+
+  // 단계별 인원 수 + 현재 필터에 맞는 목록
+  const phaseCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: list.length };
+    for (const p of list) counts[p.phase] = (counts[p.phase] ?? 0) + 1;
+    return counts;
+  }, [list]);
+
+  const filteredList = useMemo(
+    () =>
+      phaseFilter === "all" ? list : list.filter((p) => p.phase === phaseFilter),
+    [list, phaseFilter]
+  );
 
   const responseGroups = useMemo(() => {
     if (!detail) return {} as Record<string, ResponseRow[]>;
@@ -268,7 +381,11 @@ export default function AdminPage() {
                 disabled={exporting}
                 className="text-xs px-3 py-1.5 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50"
               >
-                {exporting ? "내보내는 중…" : "전체 CSV 다운로드"}
+                {exporting
+                  ? "내보내는 중…"
+                  : phaseFilter === "all"
+                    ? "전체 CSV 다운로드"
+                    : `${phaseLabel(phaseFilter)} CSV 다운로드`}
               </button>
               <button
                 onClick={() => setShowCsvHelp((v) => !v)}
@@ -301,6 +418,45 @@ export default function AdminPage() {
         </div>
       ) : (
         <>
+          {/* 현재 실험 단계 설정 — 새로 들어오는 참가자에게 찍힌다 */}
+          <div className="bg-white border-b border-gray-200 px-6 py-2.5 flex items-center gap-3 text-sm">
+            <span className="text-xs font-medium text-gray-500">
+              현재 실험 단계
+            </span>
+            {currentPhase && (
+              <span
+                className={`text-[11px] px-2 py-0.5 rounded font-semibold ${PHASE_BADGE_STYLES[currentPhase]}`}
+              >
+                {PHASE_LABELS[currentPhase]}
+              </span>
+            )}
+            <select
+              value={phaseDraft}
+              onChange={(e) => setPhaseDraft(e.target.value as Phase)}
+              disabled={phaseSaving}
+              className="border border-gray-300 rounded-md px-2 py-1 text-xs text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {PHASES.map((p) => (
+                <option key={p} value={p}>
+                  {PHASE_LABELS[p]} ({p})
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={() => void savePhase()}
+              disabled={phaseSaving || phaseDraft === currentPhase}
+              className="text-xs px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40"
+            >
+              {phaseSaving ? "변경 중…" : "변경"}
+            </button>
+            <span className="text-[11px] text-gray-400">
+              이후 새로 시작하는 참가자에게 이 단계가 기록됩니다. 파일럿·본실험
+              시작 전에 꼭 변경하세요. 운영 중 확인차 들어갈 땐 링크에{" "}
+              <code className="text-gray-500">&phase=test</code>를 붙이면 항상
+              테스트로 기록됩니다.
+            </span>
+          </div>
+
           {error && (
             <p className="bg-red-50 border-b border-red-200 px-6 py-2 text-sm text-red-700">
               {error}
@@ -317,6 +473,9 @@ export default function AdminPage() {
                   <p className="font-medium text-gray-800 mb-1">기본 정보</p>
                   <ul className="space-y-0.5">
                     <li><code className="text-gray-900">participant_id</code> — 참가자 고유 ID</li>
+                    <li><code className="text-gray-900">phase</code> — 실험 단계 (<code>test</code> 내부 테스트 · <code>pilot</code> 파일럿 · <code>main</code> 본실험)</li>
+                    <li><code className="text-gray-900">external_id</code> — 외부 패널(CloudResearch 등) 참가자 식별자. 승인 시 이 값으로 매칭</li>
+                    <li><code className="text-gray-900">external_meta</code> — 진입 URL 쿼리스트링 전체 (JSON)</li>
                     <li><code className="text-gray-900">condition</code> — 실험 조건 (예: <code>ai_10</code> = AI 라벨 표시 + 댓글 10개, <code>no_ai_5</code> = 라벨 없음 + 5개)</li>
                     <li><code className="text-gray-900">consent</code> — 동의 여부 (Y/N)</li>
                     <li><code className="text-gray-900">current_step</code> — 도달한 단계</li>
@@ -356,11 +515,27 @@ export default function AdminPage() {
           <div className="flex" style={{ height: "calc(100vh - 49px)" }}>
         {/* 좌측 참가자 리스트 */}
         <aside className="w-96 border-r border-gray-200 bg-white overflow-y-auto">
-          <div className="px-4 py-3 border-b border-gray-200 text-xs text-gray-500 sticky top-0 bg-white">
-            총 {list.length}명
+          <div className="px-4 py-2 border-b border-gray-200 sticky top-0 bg-white">
+            <div className="flex gap-1">
+              {(["all", ...PHASES] as const).map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => setPhaseFilter(f)}
+                  className={`text-[11px] px-2 py-1 rounded font-medium ${
+                    phaseFilter === f
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  {f === "all" ? "전체" : PHASE_LABELS[f]}{" "}
+                  {phaseCounts[f] ?? 0}
+                </button>
+              ))}
+            </div>
           </div>
           <ul>
-            {list.map((p) => {
+            {filteredList.map((p) => {
               const isSelected = p.id === selectedId;
               return (
                 <li key={p.id}>
@@ -385,8 +560,20 @@ export default function AdminPage() {
                         {p.completedAt ? "완료" : `Step ${p.currentStep}`}
                       </span>
                     </div>
-                    <div className="mt-1 text-xs text-gray-700">
+                    <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-700">
                       <span className="font-semibold">{p.condition}</span>
+                      <span
+                        className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                          PHASE_BADGE_STYLES[p.phase] ?? "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        {phaseLabel(p.phase)}
+                      </span>
+                      {p.externalId && (
+                        <code className="text-[10px] text-gray-400 truncate">
+                          {p.externalId}
+                        </code>
+                      )}
                     </div>
                     <div className="mt-0.5 text-[11px] text-gray-500">
                       시작 {formatDate(p.startedAt)} · 응답 {p._count.responses}
@@ -396,9 +583,11 @@ export default function AdminPage() {
                 </li>
               );
             })}
-            {list.length === 0 && (
+            {filteredList.length === 0 && (
               <li className="px-4 py-6 text-center text-sm text-gray-500">
-                참가자 데이터가 없습니다.
+                {phaseFilter === "all"
+                  ? "참가자 데이터가 없습니다."
+                  : `${phaseLabel(phaseFilter)} 단계의 참가자가 없습니다.`}
               </li>
             )}
           </ul>
@@ -438,6 +627,48 @@ export default function AdminPage() {
                     <dt className="text-gray-500 text-xs">조건</dt>
                     <dd className="text-gray-900 font-medium">
                       {detail.condition}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-gray-500 text-xs">실험 단계</dt>
+                    <dd className="flex items-center gap-2">
+                      <span
+                        className={`text-[11px] px-1.5 py-0.5 rounded font-medium ${
+                          PHASE_BADGE_STYLES[detail.phase] ??
+                          "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        {phaseLabel(detail.phase)}
+                      </span>
+                      <select
+                        value={detail.phase}
+                        onChange={(e) =>
+                          void changeParticipantPhase(
+                            detail.id,
+                            e.target.value as Phase
+                          )
+                        }
+                        className="border border-gray-300 rounded px-1.5 py-0.5 text-[11px] text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        title="이 참가자의 단계를 재분류합니다"
+                      >
+                        {PHASES.map((p) => (
+                          <option key={p} value={p}>
+                            {PHASE_LABELS[p]}
+                          </option>
+                        ))}
+                      </select>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-gray-500 text-xs">
+                      외부 식별자 (CloudResearch)
+                    </dt>
+                    <dd className="text-gray-900">
+                      {detail.externalId ? (
+                        <code className="text-xs">{detail.externalId}</code>
+                      ) : (
+                        "—"
+                      )}
                     </dd>
                   </div>
                   <div>
