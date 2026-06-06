@@ -228,7 +228,8 @@ export const postSurveyQuestions: SurveyQuestion[] = [
   },
   {
     id: "psc-4",
-    question: "존엄사 콘텐츠 댓글에 나타난 주장은 커뮤니티의 주류 의견이다.",
+    question:
+      "존엄사 콘텐츠 댓글에 나타난 주장은 일반적으로 커뮤니티를 사용하는 사람들의 주류 의견이다.",
     type: "likert7",
     required: true,
     page: 1,
@@ -236,7 +237,7 @@ export const postSurveyQuestions: SurveyQuestion[] = [
   {
     id: "psc-5",
     question:
-      "커뮤니티 사람들은 존엄사 콘텐츠 댓글에 나타난 주장을 주변 사람들에게 공유할 것이다.",
+      "일반적으로 커뮤니티를 사용하는 사람들은 존엄사 콘텐츠 댓글에 나타난 주장을 주변 사람들에게 공유할 것이다.",
     type: "likert7",
     required: true,
     page: 1,
@@ -244,7 +245,7 @@ export const postSurveyQuestions: SurveyQuestion[] = [
   {
     id: "psc-6",
     question:
-      "커뮤니티 사람들은 존엄사 콘텐츠 댓글에 나타난 주장을 긍정적으로 평가할 것이다.",
+      "일반적으로 커뮤니티를 사용하는 사람들은 존엄사 콘텐츠 댓글에 나타난 주장을 긍정적으로 평가할 것이다.",
     type: "likert7",
     required: true,
     page: 1,
@@ -259,6 +260,13 @@ export const postSurveyQuestions: SurveyQuestion[] = [
   {
     id: "pcs-2",
     question: "논리가 납득되지는 않지만, 우선 대중적인 의견에 맞췄다.",
+    type: "likert7",
+    required: true,
+    page: 1,
+  },
+  {
+    id: "pcs-2b",
+    question: "나는 다수 댓글의 논리가 납득되었고, 대중적인 의견에 맞췄다.",
     type: "likert7",
     required: true,
     page: 1,
@@ -373,7 +381,7 @@ export const postSurveyQuestions: SurveyQuestion[] = [
   },
   {
     id: "at-1",
-    question: "당신의 태도가 올바른 태도라고 얼마나 확신합니까?",
+    question: "나는 평소 내 태도가 올바르다고 확신한다.",
     type: "likert7",
     required: true,
     page: 3,
@@ -419,7 +427,7 @@ export const postSurveyQuestions: SurveyQuestion[] = [
   },
   {
     id: "sz-1",
-    question: "방금 보신 게시물에는 몇 개의 댓글이 달려 있었습니까?",
+    question: "존엄사 콘텐츠 게시물에는 몇 개의 댓글이 달려 있었습니까?",
     type: "number",
     required: true,
     min: 0,
