@@ -5,6 +5,7 @@ import type { QuestionType, SurveyQuestion } from "@/data/survey-questions";
 import SurveyForm from "@/components/survey/SurveyForm";
 
 type SurveyType = "pre" | "post";
+type EditLang = "ko" | "en";
 
 const TYPE_LABELS: Record<QuestionType, string> = {
   likert7: "리커트 7점",
@@ -37,6 +38,7 @@ type Props = { password: string };
 
 export default function QuestionEditor({ password }: Props) {
   const [surveyType, setSurveyType] = useState<SurveyType>("pre");
+  const [editLang, setEditLang] = useState<EditLang>("ko");
   const [questions, setQuestions] = useState<SurveyQuestion[] | null>(null);
   const [original, setOriginal] = useState<string>(""); // JSON 스냅샷 (dirty 판정용)
   const [customized, setCustomized] = useState(false);
@@ -48,13 +50,13 @@ export default function QuestionEditor({ password }: Props) {
   const [mode, setMode] = useState<"edit" | "preview">("edit");
   const [previewKey, setPreviewKey] = useState(0);
 
-  async function load(type: SurveyType) {
+  async function load(type: SurveyType, lang: EditLang) {
     setLoading(true);
     setError(null);
     setNotice(null);
     try {
       const res = await fetch(
-        `/api/admin/survey?type=${type}&password=${encodeURIComponent(password)}`,
+        `/api/admin/survey?type=${type}&lang=${lang}&password=${encodeURIComponent(password)}`,
         { cache: "no-store" }
       );
       if (!res.ok) {
@@ -78,9 +80,9 @@ export default function QuestionEditor({ password }: Props) {
   }
 
   useEffect(() => {
-    void load(surveyType);
+    void load(surveyType, editLang);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [surveyType]);
+  }, [surveyType, editLang]);
 
   const dirty = useMemo(
     () => questions !== null && JSON.stringify(questions) !== original,
@@ -169,7 +171,7 @@ export default function QuestionEditor({ password }: Props) {
     setNotice(null);
     try {
       const res = await fetch(
-        `/api/admin/survey?type=${surveyType}&password=${encodeURIComponent(password)}`,
+        `/api/admin/survey?type=${surveyType}&lang=${editLang}&password=${encodeURIComponent(password)}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -205,7 +207,7 @@ export default function QuestionEditor({ password }: Props) {
     setNotice(null);
     try {
       const res = await fetch(
-        `/api/admin/survey?type=${surveyType}&password=${encodeURIComponent(password)}`,
+        `/api/admin/survey?type=${surveyType}&lang=${editLang}&password=${encodeURIComponent(password)}`,
         { method: "DELETE" }
       );
       const data = await res.json();
@@ -253,6 +255,23 @@ export default function QuestionEditor({ password }: Props) {
               }`}
             >
               {t === "pre" ? "사전 설문" : "사후 설문"}
+            </button>
+          ))}
+        </div>
+
+        <div className="inline-flex rounded-md border border-gray-300 overflow-hidden">
+          {(["ko", "en"] as EditLang[]).map((l) => (
+            <button
+              key={l}
+              onClick={() => {
+                if (dirty && !confirm("저장하지 않은 변경이 있습니다. 이동할까요?")) return;
+                setEditLang(l);
+              }}
+              className={`px-3 py-1.5 text-sm ${
+                editLang === l ? "bg-violet-600 text-white" : "bg-white text-gray-700"
+              }`}
+            >
+              {l === "ko" ? "한국어" : "English"}
             </button>
           ))}
         </div>

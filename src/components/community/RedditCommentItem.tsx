@@ -1,5 +1,8 @@
 "use client";
 
+import { UI } from "@/i18n/ui";
+import { useLang } from "@/lib/useLang";
+
 type RedditCommentItemProps = {
   author: string;
   content: string;
@@ -17,6 +20,7 @@ export default function RedditCommentItem({
   showAiLabel,
   isCurrentUser = false,
 }: RedditCommentItemProps) {
+  const lang = useLang();
   return (
     <div className="flex gap-3 py-3">
       {/* Avatar + vertical thread line */}
@@ -48,7 +52,7 @@ export default function RedditCommentItem({
         {showAiLabel && (
           <p className="flex items-center gap-1 mt-1 text-[11px] font-semibold text-red-600">
             <span aria-hidden>🤖</span>
-            AI가 작성한 댓글입니다
+            {UI[lang].comment.aiLabel}
           </p>
         )}
 

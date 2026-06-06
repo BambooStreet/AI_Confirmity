@@ -4,6 +4,8 @@ import { useState } from "react";
 import RedditCommentItem from "./RedditCommentItem";
 import RedditCommentInput from "./RedditCommentInput";
 import type { PresetComment } from "@/data/comments";
+import { UI } from "@/i18n/ui";
+import { useLang } from "@/lib/useLang";
 
 export type { PresetComment };
 
@@ -35,6 +37,7 @@ export default function RedditCommentList({
   showInput = true,
   onUserCommentSubmitted,
 }: RedditCommentListProps) {
+  const lang = useLang();
   const [userComments, setUserComments] = useState<UserComment[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -56,7 +59,12 @@ export default function RedditCommentList({
     } finally {
       setUserComments((prev) => [
         ...prev,
-        { id: newId, author: "나", content, timeAgo: "방금 전" },
+        {
+          id: newId,
+          author: UI[lang].comment.selfName,
+          content,
+          timeAgo: lang === "en" ? "just now" : "방금 전",
+        },
       ]);
       setIsSubmitting(false);
       onUserCommentSubmitted?.(content);

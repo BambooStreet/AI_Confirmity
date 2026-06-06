@@ -1,6 +1,8 @@
 "use client";
 
 import { likert7Labels } from "@/data/survey-questions";
+import { likert7LabelsEn } from "@/data/survey-questions.en";
+import { useLang } from "@/lib/useLang";
 
 type LikertScaleProps = {
   questionId: string;
@@ -17,6 +19,8 @@ export default function LikertScale({
   onChange,
   required = false,
 }: LikertScaleProps) {
+  const lang = useLang();
+  const labels = lang === "en" ? likert7LabelsEn : likert7Labels;
   return (
     <div className="mb-6">
       <p className="text-sm font-medium text-gray-900 mb-3">
@@ -24,7 +28,7 @@ export default function LikertScale({
         {required && <span className="text-red-500 ml-1">*</span>}
       </p>
       <div className="grid grid-cols-7 gap-1.5">
-        {likert7Labels.map((label, index) => {
+        {labels.map((label, index) => {
           const score = String(index + 1);
           const selected = value === score;
           return (

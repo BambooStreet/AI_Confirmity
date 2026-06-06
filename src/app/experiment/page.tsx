@@ -12,8 +12,75 @@ import RedditPost from "@/components/community/RedditPost";
 import RedditCommentList from "@/components/community/RedditCommentList";
 import { buildAschComments, computeAiClaim } from "@/data/asch-comments";
 import { useExperimentSession } from "@/lib/useExperimentSession";
+import { useLang } from "@/lib/useLang";
 
 type Stage = 1 | 2 | 3 | 4;
+
+const CONTENT = {
+  ko: {
+    title: "본실험 1",
+    stageIndicator: (stage: Stage) => `단계 ${stage} / 4`,
+    stage1Title: "기준 선분을 잘 기억해주세요",
+    stage1Desc: (sec: number) => `${sec}초 뒤 자동으로 다음 단계로 넘어갑니다.`,
+    stage2Title: "방금 본 기준 선분(★)과 길이가 같은 비교 선분은 무엇인가요?",
+    stage2Desc: "A·B·C 중 기준선과 가장 가까운 길이의 선분을 하나 골라주세요.",
+    confidenceQuestion: "본인의 선택에 얼마나 확신하십니까?",
+    confidenceLow: "1 = 전혀 확신 안 함",
+    confidenceHigh: "7 = 매우 확신함",
+    saving: "저장 중…",
+    next: "다음",
+    postedAgo: "30분 전",
+    postTitle: "이 선분 길이 비교, 기준선과 같은 게 어느 거예요? (A/B/C)",
+    postBodyIntro: (
+      <>
+        앞서 보여드린 <strong>기준 선분(★)</strong>과 같은 길이의 비교선이 뭔지
+        의견 좀 모아봅시다. 댓글로 본인 답이랑 이유 같이 남겨주세요.
+      </>
+    ),
+    postNotice:
+      "※ '기준 선분'은 단계 1에서 잠깐 보여드렸던 ★ 표시의 선분을 말합니다. 그 선분과 길이가 같은 비교선(A·B·C)을 찾아주세요.",
+    inputPlaceholder: "본인 답과 이유를 자유롭게 적어주세요…",
+    mustComment: "다음 단계로 넘어가려면 본인의 의견을 댓글로 남겨주세요.",
+    stage4Title: "다시 한 번 골라주세요",
+    stage4Desc:
+      "방금 댓글들을 보고 난 뒤, 처음에 본 기준 선분(★)과 길이가 같은 비교 선분을 다시 선택해주세요. 의견을 바꿔도 좋고, 그대로 유지해도 좋습니다.",
+    nextToExp2: "다음 (본실험2)",
+  },
+  en: {
+    title: "Task 1",
+    stageIndicator: (stage: Stage) => `Step ${stage} / 4`,
+    stage1Title: "Memorize the reference line",
+    stage1Desc: (sec: number) =>
+      `Moving to the next step automatically in ${sec}s.`,
+    stage2Title:
+      "Which comparison line is the same length as the reference line (★) you just saw?",
+    stage2Desc:
+      "Choose the one line among A, B, and C closest in length to the reference line.",
+    confidenceQuestion: "How confident are you in your choice?",
+    confidenceLow: "1 = Not confident at all",
+    confidenceHigh: "7 = Extremely confident",
+    saving: "Saving…",
+    next: "Next",
+    postedAgo: "30m ago",
+    postTitle:
+      "Line length comparison — which one matches the reference line? (A/B/C)",
+    postBodyIntro: (
+      <>
+        Let&apos;s gather opinions on which comparison line is the same length
+        as the <strong>reference line (★)</strong> shown earlier. Leave a
+        comment with your answer and reasoning.
+      </>
+    ),
+    postNotice:
+      "※ The 'reference line' is the ★-marked line briefly shown in Step 1. Find the comparison line (A, B, or C) that matches its length.",
+    inputPlaceholder: "Share your answer and reasoning freely…",
+    mustComment: "Leave a comment with your opinion to move on to the next step.",
+    stage4Title: "Choose once more",
+    stage4Desc:
+      "Now that you have seen the comments, select again the comparison line that matches the reference line (★) you saw at the beginning. You may change your answer or keep it the same.",
+    nextToExp2: "Next (Task 2)",
+  },
+} as const;
 
 async function saveAschResponse(
   participantId: string,
@@ -42,10 +109,12 @@ function ConfidenceScale({
   value: number | null;
   onChange: (v: number) => void;
 }) {
+  const lang = useLang();
+  const c = CONTENT[lang];
   return (
     <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
       <p className="text-sm font-medium text-gray-800 mb-3">
-        본인의 선택에 얼마나 확신하십니까?
+        {c.confidenceQuestion}
       </p>
       <div className="grid grid-cols-7 gap-1.5">
         {Array.from({ length: 7 }, (_, i) => i + 1).map((score) => {
@@ -67,8 +136,8 @@ function ConfidenceScale({
         })}
       </div>
       <div className="mt-2 flex justify-between text-[11px] text-gray-500">
-        <span>1 = 전혀 확신 안 함</span>
-        <span>7 = 매우 확신함</span>
+        <span>{c.confidenceLow}</span>
+        <span>{c.confidenceHigh}</span>
       </div>
     </div>
   );
@@ -76,6 +145,8 @@ function ConfidenceScale({
 
 export default function ExperimentPage() {
   const router = useRouter();
+  const lang = useLang();
+  const c = CONTENT[lang];
   const { participantId, commentCount, hasAiLabel, isReady } =
     useExperimentSession();
 
@@ -102,8 +173,9 @@ export default function ExperimentPage() {
   }, [stage, stage1Remaining]);
 
   const aschComments = useMemo(
-    () => (aiClaim ? buildAschComments(commentCount, aiClaim, hasAiLabel) : []),
-    [aiClaim, commentCount, hasAiLabel]
+    () =>
+      aiClaim ? buildAschComments(commentCount, aiClaim, hasAiLabel, lang) : [],
+    [aiClaim, commentCount, hasAiLabel, lang]
   );
 
   if (!isReady) {
@@ -175,19 +247,17 @@ export default function ExperimentPage() {
   return (
     <PageWrapper currentStep="experiment" maxWidth="lg">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900">본실험 1</h1>
-        <span className="text-xs text-gray-500">
-          단계 {stage} / 4
-        </span>
+        <h1 className="text-xl font-bold text-gray-900">{c.title}</h1>
+        <span className="text-xs text-gray-500">{c.stageIndicator(stage)}</span>
       </div>
 
       {stage === 1 && (
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            기준 선분을 잘 기억해주세요
+            {c.stage1Title}
           </h2>
           <p className="text-sm text-gray-600 mb-6">
-            {stage1Remaining}초 뒤 자동으로 다음 단계로 넘어갑니다.
+            {c.stage1Desc(stage1Remaining)}
           </p>
           <AschStimulus variant="reference" />
           <div className="mt-6 h-1 w-full overflow-hidden rounded-full bg-gray-200">
@@ -206,11 +276,9 @@ export default function ExperimentPage() {
       {stage === 2 && (
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            방금 본 기준 선분(★)과 길이가 같은 비교 선분은 무엇인가요?
+            {c.stage2Title}
           </h2>
-          <p className="text-sm text-gray-600 mb-6">
-            A·B·C 중 기준선과 가장 가까운 길이의 선분을 하나 골라주세요.
-          </p>
+          <p className="text-sm text-gray-600 mb-6">{c.stage2Desc}</p>
           <AschStimulus
             variant="comparison"
             selectable
@@ -228,7 +296,7 @@ export default function ExperimentPage() {
             disabled={!stageSelection || preConfidence === null || advancing}
             className="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            {advancing ? "저장 중…" : "다음"}
+            {advancing ? c.saving : c.next}
           </button>
         </section>
       )}
@@ -238,18 +306,14 @@ export default function ExperimentPage() {
           <RedditPost
             subreddit="visualperception"
             postedBy="line_check_bot"
-            postedAgo="30분 전"
-            title="이 선분 길이 비교, 기준선과 같은 게 어느 거예요? (A/B/C)"
+            postedAgo={c.postedAgo}
+            title={c.postTitle}
             score={128}
             commentCount={aschComments.length}
           >
-            <p className="mb-4 text-gray-700">
-              앞서 보여드린 <strong>기준 선분(★)</strong>과 같은 길이의 비교선이
-              뭔지 의견 좀 모아봅시다. 댓글로 본인 답이랑 이유 같이 남겨주세요.
-            </p>
+            <p className="mb-4 text-gray-700">{c.postBodyIntro}</p>
             <p className="mb-4 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800">
-              ※ &lsquo;기준 선분&rsquo;은 단계 1에서 잠깐 보여드렸던 ★ 표시의
-              선분을 말합니다. 그 선분과 길이가 같은 비교선(A·B·C)을 찾아주세요.
+              {c.postNotice}
             </p>
             <AschStimulus variant="comparison" />
           </RedditPost>
@@ -258,14 +322,14 @@ export default function ExperimentPage() {
             presetComments={aschComments}
             showAiLabel={hasAiLabel}
             participantId={participantId}
-            inputPlaceholder="본인 답과 이유를 자유롭게 적어주세요…"
+            inputPlaceholder={c.inputPlaceholder}
             inputButtonLabel="Comment"
             onUserCommentSubmitted={() => setHasCommented(true)}
           />
 
           {!hasCommented && (
             <p className="mt-6 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-              다음 단계로 넘어가려면 본인의 의견을 댓글로 남겨주세요.
+              {c.mustComment}
             </p>
           )}
 
@@ -274,7 +338,7 @@ export default function ExperimentPage() {
             disabled={!hasCommented}
             className="mt-4 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            다음
+            {c.next}
           </button>
         </section>
       )}
@@ -282,12 +346,9 @@ export default function ExperimentPage() {
       {stage === 4 && (
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            다시 한 번 골라주세요
+            {c.stage4Title}
           </h2>
-          <p className="text-sm text-gray-600 mb-6">
-            방금 댓글들을 보고 난 뒤, 처음에 본 기준 선분(★)과 길이가 같은 비교
-            선분을 다시 선택해주세요. 의견을 바꿔도 좋고, 그대로 유지해도 좋습니다.
-          </p>
+          <p className="text-sm text-gray-600 mb-6">{c.stage4Desc}</p>
           <AschStimulus
             variant="comparison"
             selectable
@@ -305,7 +366,7 @@ export default function ExperimentPage() {
             disabled={!stageSelection || finalConfidence === null || advancing}
             className="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            {advancing ? "저장 중…" : "다음 (본실험2)"}
+            {advancing ? c.saving : c.nextToExp2}
           </button>
           {/* keep labels referenced for type completeness */}
           <span className="hidden" aria-hidden>

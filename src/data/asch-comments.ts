@@ -1,8 +1,10 @@
 import type { PresetComment } from "@/data/comments";
 import type { AschLineLabel } from "@/components/experiment/AschStimulus";
 import type { CommentCount } from "@/lib/conditions";
+import { aschTemplatesEn } from "@/data/asch-comments.en";
+import type { Lang } from "@/i18n/ui";
 
-type Template = {
+export type AschTemplate = {
   author: string;
   body: (label: AschLineLabel) => string;
   likes: number;
@@ -10,7 +12,8 @@ type Template = {
 };
 
 // 30개 템플릿 — 모두 동일하게 `{label}` 비교선이 기준선과 같다고 단호하게 주장
-const TEMPLATES: Template[] = [
+// 영어판은 asch-comments.en.ts에 인덱스 1:1로 대응.
+const TEMPLATES: AschTemplate[] = [
   { author: "정확함", likes: 42, timeAgo: "방금 전",
     body: (l) => `${l}번이 기준선이랑 정확히 같은 길이예요. 의심의 여지 없음.` },
   { author: "꼼꼼이", likes: 37, timeAgo: "1분 전",
@@ -86,9 +89,11 @@ export function computeAiClaim(userChoice: AschLineLabel): AschLineLabel {
 export function buildAschComments(
   count: CommentCount,
   aiClaim: AschLineLabel,
-  hasAiLabel: boolean
+  hasAiLabel: boolean,
+  lang: Lang = "ko"
 ): PresetComment[] {
-  const pool = TEMPLATES.slice(0, count);
+  const templates = lang === "en" ? aschTemplatesEn : TEMPLATES;
+  const pool = templates.slice(0, count);
   return pool.map((t, i) => ({
     id: `asch-${i + 1}`,
     author: t.author,

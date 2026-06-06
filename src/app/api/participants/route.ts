@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isValidCondition } from "@/lib/conditions";
 import { getCurrentPhase } from "@/lib/phases-server";
+import { normalizeLang } from "@/i18n/ui";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -48,6 +49,7 @@ export async function POST(request: NextRequest) {
         data: {
           condition,
           phase,
+          language: normalizeLang(body.lang),
           ...(externalId !== null ? { externalId } : {}),
           ...(externalMeta !== null ? { externalMeta } : {}),
         },
@@ -68,6 +70,8 @@ export async function POST(request: NextRequest) {
   const response = NextResponse.json({
     id: participant.id,
     condition: participant.condition,
+    // 재진입(dedup) 시 기존 참가자의 언어가 우선되도록 응답에 포함
+    language: participant.language,
   });
 
   response.cookies.set("participant_id", participant.id, {

@@ -11,37 +11,12 @@ import {
   type PresetComment,
 } from "@/data/comments";
 import { useExperimentSession } from "@/lib/useExperimentSession";
+import { useLang } from "@/lib/useLang";
+import { EXP2_CONTENT } from "./content";
 
 type Stage = 1 | 2 | 3 | 4 | 5;
 
-const LIKERT_LABELS = [
-  "매우 반대",
-  "반대",
-  "약간 반대",
-  "중립",
-  "약간 찬성",
-  "찬성",
-  "매우 찬성",
-];
-
 const QUIZ_HOLD_SECONDS = 15;
-
-const QUIZ_Q1_QUESTION = "존엄사는 어떤 환자를 대상으로 하나요?";
-const QUIZ_Q1_OPTIONS = [
-  "회복 가능성이 없는 환자",
-  "감기에 걸린 환자",
-  "건강한 일반인",
-];
-const QUIZ_Q1_ANSWER = "회복 가능성이 없는 환자";
-
-const QUIZ_Q2_QUESTION =
-  "다음 중 소극적 존엄사(연명의료 중단)에 해당하는 것은 무엇인가요?";
-const QUIZ_Q2_OPTIONS = [
-  "인공호흡기 등 연명 치료를 중단하는 것",
-  "건강한 사람의 운동을 중단하는 것",
-  "병원의 일반 외래 진료를 받지 않는 것",
-];
-const QUIZ_Q2_ANSWER = "인공호흡기 등 연명 치료를 중단하는 것";
 
 async function saveEuthanasiaResponse(
   participantId: string,
@@ -64,16 +39,18 @@ async function saveEuthanasiaResponse(
 }
 
 function LikertScale({
+  labels,
   value,
   onChange,
 }: {
+  labels: readonly string[];
   value: number | null;
   onChange: (v: number) => void;
 }) {
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-7 gap-2">
-        {LIKERT_LABELS.map((label, idx) => {
+        {labels.map((label, idx) => {
           const score = idx + 1;
           const selected = value === score;
           return (
@@ -106,17 +83,21 @@ function LikertScale({
 }
 
 function ConfidenceScale({
+  question,
+  lowLabel,
+  highLabel,
   value,
   onChange,
 }: {
+  question: string;
+  lowLabel: string;
+  highLabel: string;
   value: number | null;
   onChange: (v: number) => void;
 }) {
   return (
     <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
-      <p className="text-sm font-medium text-gray-800 mb-3">
-        본인의 선택에 얼마나 확신하십니까?
-      </p>
+      <p className="text-sm font-medium text-gray-800 mb-3">{question}</p>
       <div className="grid grid-cols-7 gap-1.5">
         {Array.from({ length: 7 }, (_, i) => i + 1).map((score) => {
           const selected = value === score;
@@ -137,8 +118,8 @@ function ConfidenceScale({
         })}
       </div>
       <div className="mt-2 flex justify-between text-[11px] text-gray-500">
-        <span>1 = 전혀 확신 안 함</span>
-        <span>7 = 매우 확신함</span>
+        <span>{lowLabel}</span>
+        <span>{highLabel}</span>
       </div>
     </div>
   );
@@ -190,6 +171,8 @@ function QuizQuestion({
 
 export default function ExperimentTwoPage() {
   const router = useRouter();
+  const lang = useLang();
+  const c = EXP2_CONTENT[lang];
   const { participantId, commentCount, hasAiLabel, isReady } =
     useExperimentSession();
 
@@ -233,9 +216,10 @@ export default function ExperimentTwoPage() {
     return getCommentsForCondition(
       commentCount,
       hasAiLabel,
-      stanceForPreOpinion(preOpinion)
+      stanceForPreOpinion(preOpinion),
+      lang
     );
-  }, [commentCount, hasAiLabel, preOpinion]);
+  }, [commentCount, hasAiLabel, preOpinion, lang]);
 
   if (!isReady) {
     return (
@@ -258,8 +242,8 @@ export default function ExperimentTwoPage() {
     const nextAttempts = quizAttempts + 1;
     setQuizAttempts(nextAttempts);
 
-    const correct1 = quiz1Locked || quiz1 === QUIZ_Q1_ANSWER;
-    const correct2 = quiz2Locked || quiz2 === QUIZ_Q2_ANSWER;
+    const correct1 = quiz1Locked || quiz1 === c.q1.answer;
+    const correct2 = quiz2Locked || quiz2 === c.q2.answer;
 
     if (!correct1 || !correct2) {
       if (!quiz1Locked) {
@@ -281,12 +265,12 @@ export default function ExperimentTwoPage() {
       await saveEuthanasiaResponse(
         participantId,
         "quiz_q1",
-        quiz1 ?? QUIZ_Q1_ANSWER
+        quiz1 ?? c.q1.answer
       );
       await saveEuthanasiaResponse(
         participantId,
         "quiz_q2",
-        quiz2 ?? QUIZ_Q2_ANSWER
+        quiz2 ?? c.q2.answer
       );
       await saveEuthanasiaResponse(
         participantId,
@@ -355,20 +339,16 @@ export default function ExperimentTwoPage() {
   return (
     <PageWrapper currentStep="experiment-2" maxWidth="lg">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900">본실험 2</h1>
-        <span className="text-xs text-gray-500">단계 {stage} / 5</span>
+        <h1 className="text-xl font-bold text-gray-900">{c.title}</h1>
+        <span className="text-xs text-gray-500">{c.stageIndicator(stage)}</span>
       </div>
 
       {stage === 1 && (
         <section>
           {holdingRemaining !== null ? (
             <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-              <p className="font-semibold mb-1">
-                오답이 있어요. 아래 설명을 다시 한 번 읽어주세요.
-              </p>
-              <p>
-                {holdingRemaining}초 뒤에 자동으로 틀린 문항만 다시 출제됩니다.
-              </p>
+              <p className="font-semibold mb-1">{c.wrongTitle}</p>
+              <p>{c.wrongCountdown(holdingRemaining)}</p>
               <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-amber-100">
                 <div
                   className="h-full bg-amber-500 transition-all duration-1000 ease-linear"
@@ -383,37 +363,13 @@ export default function ExperimentTwoPage() {
               </div>
             </div>
           ) : (
-            <p className="text-sm text-gray-600 mb-4">
-              아래 글을 읽고 이어지는 질문에 답해주세요.
-            </p>
+            <p className="text-sm text-gray-600 mb-4">{c.readIntro}</p>
           )}
           <h2 className="text-lg font-semibold text-gray-900 mb-3">
-            존엄사란 무엇인가요?
+            {c.defTitle}
           </h2>
           <div className="prose prose-sm max-w-none text-gray-700 space-y-3 mb-6">
-            <p>
-              <strong>존엄사(尊嚴死)</strong>는 회복 가능성이 없는 환자가 본인의
-              의사에 따라 무의미한 연명 의료를 중단하거나, 의료진의 도움을 받아
-              스스로 삶을 마무리하는 것을 말합니다.
-            </p>
-            <p>일반적으로 다음과 같이 구분됩니다.</p>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>
-                <strong>소극적 존엄사 (연명의료 중단)</strong>: 인공호흡기,
-                심폐소생술 등 임종 과정을 연장하는 치료를 중단하는 것. 국내에서는
-                2018년부터 「연명의료결정법」으로 제도화되어 있습니다.
-              </li>
-              <li>
-                <strong>적극적 존엄사 (조력 존엄사)</strong>: 의료진이 환자의
-                요청에 따라 약물 등으로 사망을 돕는 것. 국내에서는 아직 합법화되어
-                있지 않으며, 최근 입법 논의가 진행 중입니다.
-              </li>
-            </ul>
-            <p>
-              찬성 측은 환자의 <strong>자기결정권</strong>과 고통 경감을 강조하고,
-              반대 측은 <strong>생명 윤리</strong>, 악용 가능성, 의료진 부담 등을
-              우려합니다.
-            </p>
+            {c.defBody}
           </div>
           <button
             onClick={handleStage1Next}
@@ -421,8 +377,8 @@ export default function ExperimentTwoPage() {
             className="mt-2 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             {holdingRemaining !== null
-              ? `${holdingRemaining}초 뒤 자동으로 진행`
-              : "다음"}
+              ? c.autoAdvance(holdingRemaining)
+              : c.next}
           </button>
         </section>
       )}
@@ -430,19 +386,17 @@ export default function ExperimentTwoPage() {
       {stage === 2 && (
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            확인 퀴즈
+            {c.quizTitle}
           </h2>
           <p className="text-sm text-gray-600 mb-6">
-            {quiz1Locked || quiz2Locked
-              ? "앞서 틀린 문항을 다시 풀어주세요. 모두 맞아야 다음으로 넘어갈 수 있습니다."
-              : "앞 페이지의 설명을 바탕으로 두 문항 모두 정답을 골라주세요. 두 문항이 모두 맞아야 다음으로 넘어갈 수 있습니다."}
+            {quiz1Locked || quiz2Locked ? c.quizDescRetry : c.quizDescFirst}
           </p>
 
           {!quiz1Locked && (
             <QuizQuestion
               label="1"
-              question={QUIZ_Q1_QUESTION}
-              options={QUIZ_Q1_OPTIONS}
+              question={c.q1.question}
+              options={c.q1.options}
               value={quiz1}
               onChange={(v) => {
                 setQuiz1(v);
@@ -453,8 +407,8 @@ export default function ExperimentTwoPage() {
           {!quiz2Locked && (
             <QuizQuestion
               label={quiz1Locked ? "1" : "2"}
-              question={QUIZ_Q2_QUESTION}
-              options={QUIZ_Q2_OPTIONS}
+              question={c.q2.question}
+              options={c.q2.options}
               value={quiz2}
               onChange={(v) => {
                 setQuiz2(v);
@@ -478,7 +432,7 @@ export default function ExperimentTwoPage() {
             }
             className="mt-2 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            제출
+            {c.submit}
           </button>
         </section>
       )}
@@ -486,15 +440,19 @@ export default function ExperimentTwoPage() {
       {stage === 3 && (
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            존엄사에 대한 본인의 의견을 선택해주세요.
+            {c.stage3Title}
           </h2>
-          <p className="text-sm text-gray-600 mb-6">
-            <strong>존엄사 합법화</strong>에 대한 본인의 생각·의견과 가장 가까운
-            것을 선택해주세요.
-          </p>
-          <LikertScale value={preOpinion} onChange={setPreOpinion} />
+          <p className="text-sm text-gray-600 mb-6">{c.stage3Desc}</p>
+          <LikertScale
+            labels={c.likertLabels}
+            value={preOpinion}
+            onChange={setPreOpinion}
+          />
           {preOpinion !== null && (
             <ConfidenceScale
+              question={c.confidenceQuestion}
+              lowLabel={c.confidenceLow}
+              highLabel={c.confidenceHigh}
               value={preOpinionConfidence}
               onChange={setPreOpinionConfidence}
             />
@@ -508,7 +466,7 @@ export default function ExperimentTwoPage() {
             }
             className="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            {advancing ? "저장 중…" : "다음"}
+            {advancing ? c.saving : c.next}
           </button>
         </section>
       )}
@@ -518,59 +476,23 @@ export default function ExperimentTwoPage() {
           <RedditPost
             subreddit="ethicsdebate"
             postedBy="thinking_alone"
-            postedAgo="6시간 전"
-            title="존엄사 관련 쇼츠 봤는데… 다들 어떻게 생각함?"
+            postedAgo={c.postedAgo}
+            title={c.postTitle}
             score={342}
             commentCount={comments.length}
           >
             <div className="mb-4 mx-auto aspect-[9/16] w-full max-w-xs overflow-hidden rounded-md border border-gray-200 bg-black">
               <iframe
                 className="h-full w-full"
-                src="https://www.youtube.com/embed/3Ai462Sg7X0"
-                title="존엄사 관련 영상"
+                src={c.videoSrc}
+                title={c.videoTitle}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
             </div>
 
             <div className="space-y-3 text-gray-800 leading-relaxed">
-              <p>
-                얼마 전에 우연히 본 쇼츠 하나가 계속 머릿속에 남아서 같이
-                이야기해보고 싶어 글 올려요.
-              </p>
-              <p>
-                영상에서는 한 의사가 이런 이야기를 하더라고요. 말기 환자에게는
-                평화로운 죽음을 선택할 권리가 있어야 한다고. 정신은 온전한데
-                극심한 고통을 겪는 환자들을 곁에서 직접 봐왔고, 그래서 존엄하게
-                죽음을 맞이할 권리를 지지한다고요.
-              </p>
-              <p>
-                영상에서 그리는 &lsquo;존엄한 죽음&rsquo;의 모습은 이래요. 사랑하는
-                사람들이 곁에 있고, 좋아하던 음악을 들으며, 함께 음식을 나누고
-                추억을 이야기하다가 평화롭게 작별 인사를 하는 것.
-              </p>
-              <p>
-                영상만 보면 &ldquo;당연히 그래야지&rdquo; 싶다가도, 막상 생각해보니
-                단순하지 않더라고요.
-              </p>
-              <p>
-                정말로 &lsquo;본인의 선택&rsquo;이라는 게 가능할까요? 가족에게
-                부담 주기 싫어서, 치료비가 무서워서 선택하는 거라면 그것도
-                자유의지일까?
-              </p>
-              <p>
-                의사가 죽음을 돕는 게 의료의 본분과 충돌하지는 않을까?
-              </p>
-              <p>
-                반대로, 회복 가능성이 전혀 없고 고통만 남은 상황에서
-                &lsquo;살아라&rsquo;라고 하는 것이 더 잔인한 건 아닐까?
-              </p>
-              <p>
-                만약 우리 가족, 혹은 내 일이라면 어떤 선택을 하게 될까?
-              </p>
-              <p className="font-medium text-gray-900">
-                여러분은 어떻게 생각하세요? 찬성/반대 어느 쪽이든 이유가 궁금해요.
-              </p>
+              {c.postBody}
             </div>
           </RedditPost>
 
@@ -578,14 +500,14 @@ export default function ExperimentTwoPage() {
             presetComments={comments}
             showAiLabel={hasAiLabel}
             participantId={participantId}
-            inputPlaceholder="존엄사 합법화에 대한 본인의 의견을 자유롭게 적어주세요…"
+            inputPlaceholder={c.inputPlaceholder}
             inputButtonLabel="Comment"
             onUserCommentSubmitted={() => setHasCommented(true)}
           />
 
           {!hasCommented && (
             <p className="mt-6 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-              다음 단계로 넘어가려면 본인의 의견을 댓글로 남겨주세요.
+              {c.mustComment}
             </p>
           )}
 
@@ -594,7 +516,7 @@ export default function ExperimentTwoPage() {
             disabled={!hasCommented}
             className="mt-4 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            다음
+            {c.next}
           </button>
         </section>
       )}
@@ -602,15 +524,19 @@ export default function ExperimentTwoPage() {
       {stage === 5 && (
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            다시 한 번 본인의 생각을 골라주세요
+            {c.stage5Title}
           </h2>
-          <p className="text-sm text-gray-600 mb-6">
-            방금 댓글들을 보고 난 뒤, 존엄사 합법화에 대한 본인의 생각을 다시
-            선택해주세요. 의견을 바꿔도 좋고, 그대로 유지해도 좋습니다.
-          </p>
-          <LikertScale value={finalOpinion} onChange={setFinalOpinion} />
+          <p className="text-sm text-gray-600 mb-6">{c.stage5Desc}</p>
+          <LikertScale
+            labels={c.likertLabels}
+            value={finalOpinion}
+            onChange={setFinalOpinion}
+          />
           {finalOpinion !== null && (
             <ConfidenceScale
+              question={c.confidenceQuestion}
+              lowLabel={c.confidenceLow}
+              highLabel={c.confidenceHigh}
               value={finalOpinionConfidence}
               onChange={setFinalOpinionConfidence}
             />
@@ -624,7 +550,7 @@ export default function ExperimentTwoPage() {
             }
             className="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            {advancing ? "저장 중…" : "다음 (사후 설문)"}
+            {advancing ? c.saving : c.nextToSurvey}
           </button>
         </section>
       )}

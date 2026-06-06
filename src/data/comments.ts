@@ -465,6 +465,13 @@ const additionalPositiveComments: PresetComment[] = [
 // =============================================================================
 
 import type { CommentCount } from "@/lib/conditions";
+import type { Lang } from "@/i18n/ui";
+import {
+  baseNegativeCommentsEn,
+  additionalNegativeCommentsEn,
+  basePositiveCommentsEn,
+  additionalPositiveCommentsEn,
+} from "@/data/comments.en";
 
 /**
  * 사전 의견(Likert 1~7)에 따라 어떤 입장의 댓글을 보여줄지 결정.
@@ -480,12 +487,17 @@ export function stanceForPreOpinion(preOpinion: number): CommentStance {
 export function getCommentsForCondition(
   commentCount: CommentCount,
   hasAiLabel: boolean,
-  stance: CommentStance = "con"
+  stance: CommentStance = "con",
+  lang: Lang = "ko"
 ): PresetComment[] {
   const pool =
-    stance === "pro"
-      ? [...basePositiveComments, ...additionalPositiveComments]
-      : [...baseNegativeComments, ...additionalNegativeComments];
+    lang === "en"
+      ? stance === "pro"
+        ? [...basePositiveCommentsEn, ...additionalPositiveCommentsEn]
+        : [...baseNegativeCommentsEn, ...additionalNegativeCommentsEn]
+      : stance === "pro"
+        ? [...basePositiveComments, ...additionalPositiveComments]
+        : [...baseNegativeComments, ...additionalNegativeComments];
   const sliced = pool.slice(0, commentCount);
 
   if (!hasAiLabel) {

@@ -31,6 +31,7 @@ export async function GET(request: NextRequest) {
       id: true,
       condition: true,
       phase: true,
+      language: true,
       externalId: true,
       startedAt: true,
       completedAt: true,

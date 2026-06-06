@@ -7,6 +7,7 @@ import {
   VALID_CONDITIONS,
   type ConditionKey,
 } from "@/lib/conditions";
+import { normalizeLang, UI, type Lang } from "@/i18n/ui";
 
 function describeCondition(key: ConditionKey): string {
   const count = key.replace(/^(no_)?ai_/, "");
@@ -44,6 +45,7 @@ function extractExternalInfo(
 function startParticipant(
   condition: ConditionKey,
   external: ExternalInfo,
+  lang: Lang,
   router: ReturnType<typeof useRouter>,
   onError: (msg: string) => void
 ) {
@@ -55,21 +57,23 @@ function startParticipant(
       externalId: external.externalId,
       externalMeta: external.externalMeta,
       phase: external.phase,
+      lang,
     }),
   })
     .then((res) => res.json())
     .then((data) => {
       if (data.id) {
         localStorage.setItem("participantId", data.id);
-        // 재진입으로 기존 참가자가 반환되면 그쪽 condition을 따른다.
+        // 재진입으로 기존 참가자가 반환되면 그쪽 condition·언어를 따른다.
         localStorage.setItem("condition", data.condition ?? condition);
+        localStorage.setItem("lang", normalizeLang(data.language ?? lang));
         router.push("/consent");
       } else {
-        onError("참가자 등록 중 오류가 발생했습니다.");
+        onError(UI[lang].landing.registerError);
       }
     })
     .catch(() => {
-      onError("서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      onError(UI[lang].landing.serverError);
     });
 }
 
@@ -80,6 +84,8 @@ function LandingContent() {
   const urlCondition = searchParams.get("condition");
   const validUrlCondition =
     urlCondition && isValidCondition(urlCondition) ? urlCondition : null;
+  // 참가자 진입 언어 — localStorage 저장 전(로딩/에러 화면)에도 써야 해서 URL에서 직접 읽는다
+  const urlLang = normalizeLang(searchParams.get("lang"));
 
   const [error, setError] = useState<string | null>(() =>
     urlCondition && !validUrlCondition
@@ -95,6 +101,8 @@ function LandingContent() {
   const [submitting, setSubmitting] = useState(false);
   const [origin, setOrigin] = useState("");
   const [copied, setCopied] = useState(false);
+  // 배포 링크 영어 버전 여부 (연구자용 토글 — 링크에 &lang=en 부착)
+  const [english, setEnglish] = useState(urlLang === "en");
   const didStart = useRef(false);
 
   useEffect(() => {
@@ -109,6 +117,7 @@ function LandingContent() {
     startParticipant(
       validUrlCondition,
       extractExternalInfo(searchParams),
+      urlLang,
       router,
       (msg) => {
         setError(msg);
@@ -118,13 +127,23 @@ function LandingContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const linkFor = (c: ConditionKey) => `${origin}/?condition=${c}`;
+  const langSuffix = english ? "&lang=en" : "";
+  const linkFor = (c: ConditionKey) => `${origin}/?condition=${c}${langSuffix}`;
 
   // 그룹 선택 시 주소창 URL을 그 그룹용으로 바꾼다(자동 시작은 트리거하지 않음).
   const handleSelectChange = (value: ConditionKey) => {
     setSelected(value);
     setCopied(false);
-    router.replace(`/?condition=${value}`, { scroll: false });
+    router.replace(`/?condition=${value}${langSuffix}`, { scroll: false });
+  };
+
+  const handleEnglishChange = (checked: boolean) => {
+    setEnglish(checked);
+    setCopied(false);
+    router.replace(
+      `/?condition=${selected}${checked ? "&lang=en" : ""}`,
+      { scroll: false }
+    );
   };
 
   const copyLink = async () => {
@@ -142,7 +161,7 @@ function LandingContent() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4" />
-          <p className="text-gray-600">실험 환경을 준비하고 있습니다...</p>
+          <p className="text-gray-600">{UI[urlLang].landing.preparing}</p>
         </div>
       </div>
     );
@@ -152,10 +171,16 @@ function LandingContent() {
     if (submitting) return;
     setSubmitting(true);
     setError(null);
-    startParticipant(selected, extractExternalInfo(searchParams), router, (msg) => {
-      setError(msg);
-      setSubmitting(false);
-    });
+    startParticipant(
+      selected,
+      extractExternalInfo(searchParams),
+      english ? "en" : "ko",
+      router,
+      (msg) => {
+        setError(msg);
+        setSubmitting(false);
+      }
+    );
   };
 
   return (
@@ -211,6 +236,21 @@ function LandingContent() {
         </button>
 
         <div className="mt-6 border-t border-gray-200 pt-4">
+          <label className="flex items-center gap-2 mb-3 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={english}
+              onChange={(e) => handleEnglishChange(e.target.checked)}
+              disabled={submitting}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span className="text-sm text-gray-700">
+              영어(English) 버전
+              <span className="ml-1 text-xs text-gray-400">
+                — 링크에 &lang=en이 붙고, 참가자는 전 과정을 영어로 진행합니다
+              </span>
+            </span>
+          </label>
           <label className="block text-xs font-medium text-gray-500 mb-1">
             이 그룹 참가자 배포 링크
           </label>

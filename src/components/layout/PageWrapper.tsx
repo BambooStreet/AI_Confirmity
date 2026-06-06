@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import ProgressBar from "./ProgressBar";
 import type { Step } from "@/lib/session";
+import { useLang } from "@/lib/useLang";
 
 type PageWrapperProps = {
   currentStep: Step;
@@ -23,6 +25,13 @@ export default function PageWrapper({
   showProgress = true,
   maxWidth = "md",
 }: PageWrapperProps) {
+  const lang = useLang();
+
+  // 접근성: 스크린리더·번역기 등이 올바른 언어로 인식하도록 html lang 동기화
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className={`mx-auto ${maxWidthClasses[maxWidth]}`}>

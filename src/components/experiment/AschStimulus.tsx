@@ -1,5 +1,7 @@
 "use client";
 
+import { useLang } from "@/lib/useLang";
+
 export type AschLineLabel = "A" | "B" | "C";
 
 export const ASCH_LABELS: AschLineLabel[] = ["A", "B", "C"];
@@ -87,6 +89,9 @@ export default function AschStimulus({
   highlight = null,
   variant = "full",
 }: AschStimulusProps) {
+  const lang = useLang();
+  const referenceLabel = lang === "en" ? "Reference Line" : "기준 선분";
+  const comparisonLabel = lang === "en" ? "Comparison Lines" : "비교 선분";
   const showReference = variant !== "comparison";
   const showComparison = variant !== "reference";
 
@@ -95,7 +100,7 @@ export default function AschStimulus({
       {showReference && (
         <div className={showComparison ? "mb-4" : ""}>
           <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
-            기준 선분
+            {referenceLabel}
           </p>
           <div className="flex items-center gap-4 sm:gap-6 py-3 px-3 sm:px-4 bg-white border border-gray-200 rounded-md">
             <span className="text-base font-bold text-gray-900 w-6 shrink-0">
@@ -117,7 +122,7 @@ export default function AschStimulus({
       {showComparison && (
         <div>
           <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
-            비교 선분
+            {comparisonLabel}
           </p>
           <div className="space-y-2">
             {ASCH_LABELS.map((label) => (

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSurveyQuestions, isSurveyType } from "@/lib/survey";
+import { normalizeLang } from "@/i18n/ui";
 
 // 설문 페이지가 문항을 불러올 때 사용하는 공개 엔드포인트. 읽기 전용.
 export async function GET(request: NextRequest) {
@@ -10,6 +11,7 @@ export async function GET(request: NextRequest) {
       { status: 400 }
     );
   }
-  const questions = await getSurveyQuestions(type);
+  const lang = normalizeLang(request.nextUrl.searchParams.get("lang"));
+  const questions = await getSurveyQuestions(type, lang);
   return NextResponse.json({ questions });
 }

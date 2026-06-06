@@ -1,18 +1,12 @@
 "use client";
 
 import { STEPS, type Step } from "@/lib/session";
-
-const STEP_LABELS: Record<Step, string> = {
-  consent: "동의",
-  "pre-survey": "사전 설문",
-  instruction: "실험 안내",
-  experiment: "본실험1",
-  "experiment-2": "본실험2",
-  "post-survey": "사후 설문",
-  debrief: "완료",
-};
+import { UI } from "@/i18n/ui";
+import { useLang } from "@/lib/useLang";
 
 export default function ProgressBar({ currentStep }: { currentStep: Step }) {
+  const lang = useLang();
+  const stepLabels = UI[lang].steps;
   const currentIndex = STEPS.indexOf(currentStep);
   const progress = ((currentIndex + 1) / STEPS.length) * 100;
 
@@ -28,7 +22,7 @@ export default function ProgressBar({ currentStep }: { currentStep: Step }) {
                 : "text-gray-400"
             }`}
           >
-            {STEP_LABELS[step]}
+            {stepLabels[step]}
           </span>
         ))}
       </div>

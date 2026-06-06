@@ -5,13 +5,30 @@ import {
   type QuestionType,
   type SurveyQuestion,
 } from "@/data/survey-questions";
+import {
+  preSurveyQuestionsEn,
+  postSurveyQuestionsEn,
+} from "@/data/survey-questions.en";
+import type { Lang } from "@/i18n/ui";
 
 export type SurveyType = "pre" | "post";
 
+/**
+ * SurveyConfig 테이블의 키. 한국어는 기존 키("pre"/"post")를 그대로 쓰고,
+ * 영어는 "_en" 접미사 키로 별도 행에 저장한다 (스키마 변경 없음).
+ */
+export type SurveyConfigKey = "pre" | "post" | "pre_en" | "post_en";
+
+export function surveyConfigKey(type: SurveyType, lang: Lang): SurveyConfigKey {
+  return lang === "en" ? (`${type}_en` as SurveyConfigKey) : type;
+}
+
 /** 코드에 정의된 정적 기본 문항. DB에 행이 없을 때 이 값을 사용한다. */
-export const defaultQuestions: Record<SurveyType, SurveyQuestion[]> = {
+export const defaultQuestions: Record<SurveyConfigKey, SurveyQuestion[]> = {
   pre: preSurveyQuestions,
   post: postSurveyQuestions,
+  pre_en: preSurveyQuestionsEn,
+  post_en: postSurveyQuestionsEn,
 };
 
 const QUESTION_TYPES: QuestionType[] = [
@@ -27,15 +44,17 @@ export function isSurveyType(v: string | null | undefined): v is SurveyType {
 }
 
 /**
- * 해당 type의 문항을 반환한다. DB에 편집된 행이 있으면 그것을, 없으면 코드의 기본값을 사용한다.
+ * 해당 type·언어의 문항을 반환한다. DB에 편집된 행이 있으면 그것을, 없으면 코드의 기본값을 사용한다.
  * (읽기 전용 — 여기서 DB에 쓰지 않는다. 최초 저장은 admin 편집 시에 일어난다.)
  */
 export async function getSurveyQuestions(
-  type: SurveyType
+  type: SurveyType,
+  lang: Lang = "ko"
 ): Promise<SurveyQuestion[]> {
-  const row = await prisma.surveyConfig.findUnique({ where: { type } });
+  const key = surveyConfigKey(type, lang);
+  const row = await prisma.surveyConfig.findUnique({ where: { type: key } });
   if (row) return row.questions as unknown as SurveyQuestion[];
-  return defaultQuestions[type];
+  return defaultQuestions[key];
 }
 
 /**

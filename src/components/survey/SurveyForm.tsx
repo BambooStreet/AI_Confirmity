@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import type { SurveyQuestion } from "@/data/survey-questions";
+import { UI } from "@/i18n/ui";
+import { useLang } from "@/lib/useLang";
 import LikertScale from "./LikertScale";
 import MultipleChoice from "./MultipleChoice";
 import TextQuestion from "./TextQuestion";
@@ -25,6 +27,8 @@ export default function SurveyForm({
   onSubmit,
   isSubmitting = false,
 }: SurveyFormProps) {
+  const lang = useLang();
+  const t = UI[lang].survey;
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -66,7 +70,7 @@ export default function SurveyForm({
       (q) => q.required && !answers[q.id]
     );
     if (unanswered.length > 0) {
-      setError("필수 항목을 모두 응답해주세요.");
+      setError(t.requiredError);
       return false;
     }
     return true;
@@ -108,9 +112,7 @@ export default function SurveyForm({
   return (
     <form onSubmit={handleSubmit}>
       <div className="mb-4 flex items-center justify-between text-xs text-gray-500">
-        <span>
-          페이지 {pages.indexOf(currentPage) + 1} / {totalPages}
-        </span>
+        <span>{t.pageIndicator(pages.indexOf(currentPage) + 1, totalPages)}</span>
       </div>
 
       {pageHeader?.pageTitle && (
@@ -220,7 +222,7 @@ export default function SurveyForm({
             onClick={handlePrev}
             className="flex-1 bg-gray-100 text-gray-700 py-3 px-6 rounded-lg font-medium hover:bg-gray-200 transition-colors"
           >
-            이전
+            {t.prev}
           </button>
         )}
         {isLastPage ? (
@@ -229,7 +231,7 @@ export default function SurveyForm({
             disabled={isSubmitting}
             className="flex-[2] bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {isSubmitting ? "제출 중..." : "제출"}
+            {isSubmitting ? t.submitting : t.submit}
           </button>
         ) : (
           <button
@@ -237,7 +239,7 @@ export default function SurveyForm({
             onClick={handleNext}
             className="flex-[2] bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors"
           >
-            다음
+            {t.next}
           </button>
         )}
       </div>

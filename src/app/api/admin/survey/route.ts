@@ -3,25 +3,33 @@ import { prisma } from "@/lib/prisma";
 import { checkAdminAuth } from "@/lib/admin-auth";
 import {
   defaultQuestions,
-  getSurveyQuestions,
   isSurveyType,
+  surveyConfigKey,
   validateQuestions,
+  type SurveyConfigKey,
 } from "@/lib/survey";
+import { normalizeLang } from "@/i18n/ui";
+
+// type(pre|post) + lang(ko|en) → SurveyConfig 키 ("pre" | "post" | "pre_en" | "post_en")
+function configKeyFrom(request: NextRequest): SurveyConfigKey | null {
+  const type = request.nextUrl.searchParams.get("type");
+  if (!isSurveyType(type)) return null;
+  const lang = normalizeLang(request.nextUrl.searchParams.get("lang"));
+  return surveyConfigKey(type, lang);
+}
 
 // 현재 적용 중인 문항을 반환한다. customized=false면 코드 기본값이 그대로 쓰이는 중.
 export async function GET(request: NextRequest) {
   if (!checkAdminAuth(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const type = request.nextUrl.searchParams.get("type");
-  if (!isSurveyType(type)) {
+  const key = configKeyFrom(request);
+  if (!key) {
     return NextResponse.json({ error: "invalid type" }, { status: 400 });
   }
-  const row = await prisma.surveyConfig.findUnique({ where: { type } });
+  const row = await prisma.surveyConfig.findUnique({ where: { type: key } });
   return NextResponse.json({
-    questions: row
-      ? (row.questions as unknown)
-      : defaultQuestions[type],
+    questions: row ? (row.questions as unknown) : defaultQuestions[key],
     customized: !!row,
     updatedAt: row?.updatedAt ?? null,
   });
@@ -32,8 +40,8 @@ export async function PUT(request: NextRequest) {
   if (!checkAdminAuth(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const type = request.nextUrl.searchParams.get("type");
-  if (!isSurveyType(type)) {
+  const key = configKeyFrom(request);
+  if (!key) {
     return NextResponse.json({ error: "invalid type" }, { status: 400 });
   }
 
@@ -53,8 +61,8 @@ export async function PUT(request: NextRequest) {
   // Prisma Json 컬럼에 저장. SurveyQuestion[]는 순수 JSON 직렬화 가능.
   const json = result.questions as unknown as object;
   const saved = await prisma.surveyConfig.upsert({
-    where: { type },
-    create: { type, questions: json },
+    where: { type: key },
+    create: { type: key, questions: json },
     update: { questions: json },
   });
 
@@ -70,11 +78,14 @@ export async function DELETE(request: NextRequest) {
   if (!checkAdminAuth(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const type = request.nextUrl.searchParams.get("type");
-  if (!isSurveyType(type)) {
+  const key = configKeyFrom(request);
+  if (!key) {
     return NextResponse.json({ error: "invalid type" }, { status: 400 });
   }
-  await prisma.surveyConfig.deleteMany({ where: { type } });
-  const questions = await getSurveyQuestions(type);
-  return NextResponse.json({ questions, customized: false, updatedAt: null });
+  await prisma.surveyConfig.deleteMany({ where: { type: key } });
+  return NextResponse.json({
+    questions: defaultQuestions[key],
+    customized: false,
+    updatedAt: null,
+  });
 }

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { UI } from "@/i18n/ui";
+import { useLang } from "@/lib/useLang";
 
 type RedditCommentInputProps = {
   onSubmit: (content: string) => void;
@@ -13,10 +15,12 @@ type RedditCommentInputProps = {
 export default function RedditCommentInput({
   onSubmit,
   isSubmitting = false,
-  placeholder = "본인의 의견을 댓글로 남겨주세요…",
+  placeholder,
   buttonLabel = "Comment",
   minLength = 1,
 }: RedditCommentInputProps) {
+  const lang = useLang();
+  const resolvedPlaceholder = placeholder ?? UI[lang].comment.placeholder;
   const [content, setContent] = useState("");
   const [focused, setFocused] = useState(false);
 
@@ -39,14 +43,17 @@ export default function RedditCommentInput({
       } bg-white`}
     >
       <p className="text-[11px] text-gray-500 px-3 pt-2">
-        Comment as <span className="text-blue-600 font-semibold">u/나</span>
+        Comment as{" "}
+        <span className="text-blue-600 font-semibold">
+          u/{UI[lang].comment.selfName}
+        </span>
       </p>
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
         rows={focused || content ? 5 : 3}
         className="w-full px-3 py-2 text-sm text-gray-900 placeholder-gray-400 outline-none resize-none rounded-md bg-transparent"
       />
