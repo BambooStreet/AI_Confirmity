@@ -232,6 +232,59 @@ const additionalNegativeComments: PresetComment[] = [
     likes: 79,
     isAiGenerated: true,
   },
+  {
+    id: "neg-ext-19",
+    author: "노인복지센터",
+    content:
+      "노인 학대 사례 다루는 일을 합니다. 재산 문제로 부모님을 압박하는 가족, 생각보다 정말 많아요. 존엄사가 합법화되면 '본인 의사'라는 서류 한 장 뒤에서 무슨 일이 일어날지 현장에 있는 사람으로서 정말 걱정됩니다. 심사 절차가 있다고 해도 가족 내부의 은근한 압박까지 걸러낼 수는 없어요.",
+    timeAgo: "10시간 전",
+    likes: 113,
+    isAiGenerated: true,
+  },
+  {
+    id: "neg-ext-20",
+    author: "내과개원의",
+    content:
+      "의사 입장에서 하나 더 보태면, 이 제도는 의사-환자 신뢰를 근본부터 흔들어요. 말기 환자가 '이 의사가 나를 살리려는 건가, 보내려는 건가' 의심하기 시작하면 진료 자체가 안 됩니다. 실제로 시행 국가에서 노인 환자들이 병원 가기를 무서워한다는 보고도 있어요.",
+    timeAgo: "11시간 전",
+    likes: 95,
+    isAiGenerated: true,
+  },
+  {
+    id: "neg-ext-21",
+    author: "완화의료연구자",
+    content:
+      "연구하는 입장에서 보면 '죽을 권리'가 제도화되면 완화의료 연구·투자 동력이 빠집니다. 비용이 훨씬 적게 드는 출구가 생기는데 누가 굳이 돈 들여 통증 관리 기술을 발전시키겠어요. 결국 미래의 말기 환자들이 받을 수 있었을 더 나은 돌봄이 사라지는 겁니다.",
+    timeAgo: "12시간 전",
+    likes: 68,
+    isAiGenerated: true,
+  },
+  {
+    id: "neg-ext-22",
+    author: "행정사출신",
+    content:
+      "심사위원회가 엄격할 거라는 말 못 믿겠음. 우리나라 위원회 심사가 어떻게 형식화되는지 다들 아시잖아요. 신청 건수 쌓이면 결국 서류 요건만 맞으면 통과되는 도장 기계가 될 게 뻔합니다",
+    timeAgo: "13시간 전",
+    likes: 87,
+    isAiGenerated: true,
+  },
+  {
+    id: "neg-ext-23",
+    author: "돌봄국가책임",
+    content:
+      "순서가 틀렸어요. 간병 파산, 독박 간병, 호스피스 대기 줄부터 해결하고 나서 논의해도 늦지 않습니다. 돌봄을 사회가 책임지는 시스템 없이 죽음 선택지부터 열면, 그건 선택권이 아니라 떠밀림이에요. '존엄하게 죽을 권리' 전에 '존엄하게 아플 권리'부터 보장하는 게 맞지 않나요.",
+    timeAgo: "14시간 전",
+    likes: 156,
+    isAiGenerated: true,
+  },
+  {
+    id: "neg-ext-24",
+    author: "ㅁㄴㅇㄹ",
+    content: "죽음을 '권리'로 포장하지 맙시다. 한 번 열린 문은 절대 다시 안 닫혀요",
+    timeAgo: "15시간 전",
+    likes: 124,
+    isAiGenerated: true,
+  },
 ];
 
 // =============================================================================
@@ -458,6 +511,60 @@ const additionalPositiveComments: PresetComment[] = [
     likes: 96,
     isAiGenerated: true,
   },
+  {
+    id: "pos-ext-19",
+    author: "사전의향서작성함",
+    content:
+      "저는 건강할 때 미리 연명의료 거부 의향서를 작성해둔 사람이에요. 제일 또렷한 정신으로, 충분히 고민하고 내린 결정입니다. 그런데 정작 그 순간이 오면 제 의사보다 가족 동의, 병원 방침이 우선이래요. 멀쩡할 때 한 결정조차 존중 못 받는 게 지금 시스템입니다. 본인 의사를 제도적으로 보장하는 게 그렇게 위험한 일인가요?",
+    timeAgo: "11시간 전",
+    likes: 102,
+    isAiGenerated: true,
+  },
+  {
+    id: "pos-ext-20",
+    author: "수의사관점",
+    content:
+      "수의사입니다. 반려동물이 회복 불가능한 고통에 시달리면 우리는 안락사를 '마지막 자비'라고 부르고, 끝까지 끌고 가는 걸 오히려 잔인하다고 해요. 그런데 사람한테는 그 자비가 금지라는 게 저는 늘 이상했습니다. 물론 사람은 본인 의사 확인이라는 결정적 차이가 있죠 — 그래서 더더욱, 본인이 명확히 원할 때는 가능해야 하는 거 아닌가요.",
+    timeAgo: "12시간 전",
+    likes: 178,
+    isAiGenerated: true,
+  },
+  {
+    id: "pos-ext-21",
+    author: "통계보는사람",
+    content:
+      "여론조사 찾아보면 답 나옵니다. 국내 조사에서 존엄사 입법화 찬성이 꾸준히 70~80% 수준이에요. 의사 대상 조사에서도 절반 이상이 찬성으로 나오고요. 소수의 강한 반대 목소리가 다수의 조용한 찬성을 누르고 있는 구도인 거죠. 이 정도 사회적 합의면 논의를 미룰 이유가 없습니다.",
+    timeAgo: "13시간 전",
+    likes: 145,
+    isAiGenerated: true,
+  },
+  {
+    id: "pos-ext-22",
+    author: "아버지폐섬유증",
+    content:
+      "통증은 약으로 잡는다는 분들, 호흡곤란은요? 아버지가 폐섬유증 말기셨는데 마지막 몇 주는 숨이 안 쉬어져서 매일 밤 익사하는 것 같다고 하셨어요. 그건 모르핀으로도 완전히 안 잡혀요. 고통이 통증만 있는 게 아니라는 걸 옆에서 보고 나면 이 논의가 다르게 보입니다.",
+    timeAgo: "14시간 전",
+    likes: 211,
+    isAiGenerated: true,
+  },
+  {
+    id: "pos-ext-23",
+    author: "신앙있지만찬성",
+    content:
+      "저 교회 다니는 사람인데요, 그래서 오래 고민했습니다. 근데 신이 주신 생명이 소중하다는 것과, 회복 불가능한 고통을 국가가 강제로 연장시키는 게 옳다는 건 다른 얘기더라고요. 제 신앙은 제가 지키면 되는 거고, 그걸 법으로 만들어 다른 사람의 마지막에까지 강요할 권리는 저한테 없다고 결론 내렸습니다.",
+    timeAgo: "15시간 전",
+    likes: 134,
+    isAiGenerated: true,
+  },
+  {
+    id: "pos-ext-24",
+    author: "ㅇㅇㅇ",
+    content:
+      "반대하시는 분들 보면 대부분 그 고통을 직접 안 겪어본 분들이던데. 본인 일 아니라고 쉽게 말하면 안 됨",
+    timeAgo: "16시간 전",
+    likes: 167,
+    isAiGenerated: true,
+  },
 ];
 
 // =============================================================================
@@ -498,6 +605,12 @@ export function getCommentsForCondition(
       : stance === "pro"
         ? [...basePositiveComments, ...additionalPositiveComments]
         : [...baseNegativeComments, ...additionalNegativeComments];
+  // 풀이 부족하면 조용히 잘려서 댓글 수 조작이 깨진다 — 데이터 수정 시 바로 드러나도록 로그
+  if (pool.length < commentCount) {
+    console.error(
+      `[comments] ${lang}/${stance} 댓글 풀(${pool.length}개)이 조건(${commentCount}개)보다 작습니다 — 댓글 수 처치가 깨집니다!`
+    );
+  }
   const sliced = pool.slice(0, commentCount);
 
   if (!hasAiLabel) {

@@ -229,6 +229,60 @@ export const additionalNegativeCommentsEn: PresetComment[] = [
     likes: 79,
     isAiGenerated: true,
   },
+  {
+    id: "neg-ext-19",
+    author: "ElderCareCenter",
+    content:
+      "I work on elder abuse cases. Families pressuring parents over money and inheritance — there are far more of them than you'd think. If assisted dying is legalized, I genuinely worry about what will happen behind a single sheet of paper labeled 'the patient's own wish.' No review process can filter out the quiet pressure inside a family.",
+    timeAgo: "10h ago",
+    likes: 113,
+    isAiGenerated: true,
+  },
+  {
+    id: "neg-ext-20",
+    author: "InternistMD",
+    content:
+      "One more thing from a physician's perspective: this system shakes doctor–patient trust at its foundation. Once a terminal patient starts wondering 'is this doctor trying to save me or send me off,' meaningful care becomes impossible. There are actually reports from countries with these laws of elderly patients becoming afraid to go to the hospital.",
+    timeAgo: "11h ago",
+    likes: 95,
+    isAiGenerated: true,
+  },
+  {
+    id: "neg-ext-21",
+    author: "PalliativeResearch",
+    content:
+      "From a research standpoint: once a 'right to die' is institutionalized, the momentum for palliative care research and investment drains away. When a far cheaper exit exists, who's going to keep funding advances in pain management? In the end, the better care that future terminal patients could have received simply disappears.",
+    timeAgo: "12h ago",
+    likes: 68,
+    isAiGenerated: true,
+  },
+  {
+    id: "neg-ext-22",
+    author: "ExGovAdmin",
+    content:
+      "I don't buy the 'strict review board' promise. We all know how committee reviews turn into formalities. Once applications pile up, it'll inevitably become a rubber-stamp machine that approves anything meeting the paperwork requirements",
+    timeAgo: "13h ago",
+    likes: 87,
+    isAiGenerated: true,
+  },
+  {
+    id: "neg-ext-23",
+    author: "CareIsPublicDuty",
+    content:
+      "The order is backwards. Fix caregiver bankruptcy, solo family caregiving, and hospice waitlists first — the debate can wait until then. Opening the door to death before building a system where society takes responsibility for care isn't a choice, it's a push. Before the 'right to die with dignity,' shouldn't we guarantee the right to be sick with dignity?",
+    timeAgo: "14h ago",
+    likes: 156,
+    isAiGenerated: true,
+  },
+  {
+    id: "neg-ext-24",
+    author: "asdf_anon",
+    content:
+      "Stop dressing death up as a 'right.' Once that door opens, it never closes again",
+    timeAgo: "15h ago",
+    likes: 124,
+    isAiGenerated: true,
+  },
 ];
 
 // =============================================================================
@@ -453,6 +507,60 @@ export const additionalPositiveCommentsEn: PresetComment[] = [
       "The truth is hospice beds are scarce and the cost means not everyone gets in. And even in hospice, some patients absolutely do face uncontrollable pain and delirium at the end. The premise that hospice is a cure-all just doesn't match the field. Separate from expanding hospice, there needs to be an option that respects the person's own wishes.",
     timeAgo: "10h ago",
     likes: 96,
+    isAiGenerated: true,
+  },
+  {
+    id: "pos-ext-19",
+    author: "SignedMyDirective",
+    content:
+      "I'm someone who signed an advance directive refusing life-sustaining treatment while perfectly healthy. I made that decision with the clearest mind I'll ever have, after plenty of deliberation. And yet when the moment actually comes, family consent and hospital policy apparently override my own wishes. That's the current system — even decisions made while fully competent aren't respected. Is institutionally guaranteeing a person's own will really such a dangerous thing?",
+    timeAgo: "11h ago",
+    likes: 102,
+    isAiGenerated: true,
+  },
+  {
+    id: "pos-ext-20",
+    author: "VetPerspective",
+    content:
+      "Veterinarian here. When a pet is suffering with no chance of recovery, we call euthanasia 'the last act of mercy' — and we call dragging it out cruel. It has always struck me as strange that for humans, that same mercy is forbidden. Of course there's a crucial difference: humans can confirm their own wishes. Which is exactly why it should be possible when a person clearly asks for it.",
+    timeAgo: "12h ago",
+    likes: 178,
+    isAiGenerated: true,
+  },
+  {
+    id: "pos-ext-21",
+    author: "DataWatcher",
+    content:
+      "Just look up the polls. Public support for legalizing assisted dying consistently runs around 70–80% in national surveys, and even among physicians more than half are in favor. What we have is a small, loud opposition drowning out a large, quiet majority. With this level of social consensus, there's no reason to keep postponing the debate.",
+    timeAgo: "13h ago",
+    likes: 145,
+    isAiGenerated: true,
+  },
+  {
+    id: "pos-ext-22",
+    author: "DadHadIPF",
+    content:
+      "To everyone saying pain can be managed with drugs — what about not being able to breathe? My father had end-stage pulmonary fibrosis, and in his last weeks he said every night felt like drowning. Morphine doesn't fully fix that. Once you've watched someone go through suffering that isn't just 'pain,' this whole debate looks different.",
+    timeAgo: "14h ago",
+    likes: 211,
+    isAiGenerated: true,
+  },
+  {
+    id: "pos-ext-23",
+    author: "FaithfulButFor",
+    content:
+      "I'm a churchgoer, so I wrestled with this for a long time. But I realized that believing life is a sacred gift and believing the state should forcibly prolong irreversible suffering are two different things. My faith is mine to keep — I don't have the right to write it into law and impose it on someone else's final moments. That's the conclusion I reached.",
+    timeAgo: "15h ago",
+    likes: 134,
+    isAiGenerated: true,
+  },
+  {
+    id: "pos-ext-24",
+    author: "anon_000",
+    content:
+      "Most of the people against this have never experienced that kind of suffering themselves. Easy to talk when it's not your life",
+    timeAgo: "16h ago",
+    likes: 167,
     isAiGenerated: true,
   },
 ];
