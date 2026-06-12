@@ -47,7 +47,7 @@ const CONTENT = {
       "We couldn't load your completion code. Please contact the principal researcher below and we will process your compensation.",
     contactIntro: "If you have any questions, please contact:",
     contactLines: [
-      "Principal Researcher: Haeyun Lee",
+      "Principal Researcher: Haeyoon Lee",
       "Email: hailey99@g.skku.edu",
       "Affiliation: Department of Interaction Science, Sungkyunkwan University",
     ],

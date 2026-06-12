@@ -78,7 +78,7 @@ const CONTENT = {
         heading: "Researcher Contact",
         paragraphs: [
           "If you have any questions about this study, please contact:",
-          "Principal Researcher: Haeyun Lee",
+          "Principal Researcher: Haeyoon Lee",
           "Email: hailey99@g.skku.edu",
           "Affiliation: Department of Interaction Science, Sungkyunkwan University",
         ],
