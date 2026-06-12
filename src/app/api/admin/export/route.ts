@@ -110,7 +110,8 @@ export async function GET(request: NextRequest) {
       p.completedAt ? "Y" : "N",
       isoOrEmpty(p.startedAt),
       isoOrEmpty(p.completedAt),
-      p.responses.length,
+      // 고유 문항 수(중복 재제출 제외) — 같은 (surveyType, questionId)는 1개로 집계
+      answers.size,
       p.comments.length,
       ...responseKeys.map((k) => answers.get(k) ?? ""),
       ...Array.from({ length: maxComments }, (_, i) => p.comments[i]?.content ?? ""),

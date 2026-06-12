@@ -497,7 +497,7 @@ export default function AdminPage() {
                     <li><code className="text-gray-900">current_step</code> — 도달한 단계</li>
                     <li><code className="text-gray-900">completed</code> — 사후설문까지 완료 여부 (Y/N)</li>
                     <li><code className="text-gray-900">started_at / completed_at</code> — 시작/완료 시각 (UTC)</li>
-                    <li><code className="text-gray-900">n_responses / n_comments</code> — 응답·작성 댓글 개수</li>
+                    <li><code className="text-gray-900">n_responses / n_comments</code> — 응답한 고유 문항 수(중복 재제출 제외) · 작성 댓글 개수</li>
                   </ul>
                   <p className="font-medium text-gray-800 mt-3 mb-1">컬럼 이름 규칙</p>
                   <ul className="space-y-0.5">
