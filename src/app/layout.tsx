@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "온라인 커뮤니티 댓글 연구",
-  description: "온라인 커뮤니티 게시글·댓글에 대한 이용자 인식 연구",
+  title: "Online Community Comments Study",
+  description:
+    "A study on users' perceptions of online community posts and comments",
 };
 
 export default function RootLayout({
