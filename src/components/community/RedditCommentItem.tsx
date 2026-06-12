@@ -2,6 +2,7 @@
 
 import { UI } from "@/i18n/ui";
 import { useLang } from "@/lib/useLang";
+import { avatarDataUri } from "@/lib/avatar";
 
 type RedditCommentItemProps = {
   author: string;
@@ -25,15 +26,20 @@ export default function RedditCommentItem({
     <div className="flex gap-3 py-3">
       {/* Avatar + vertical thread line */}
       <div className="flex flex-col items-center shrink-0">
-        <div
-          className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
-            isCurrentUser
-              ? "bg-blue-500 text-white"
-              : "bg-gray-300 text-gray-700"
-          }`}
-        >
-          {author[0]}
-        </div>
+        {isCurrentUser ? (
+          // 본인(OP)은 식별을 위해 파란 이니셜 원 유지
+          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold bg-blue-500 text-white">
+            {author[0]}
+          </div>
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={avatarDataUri(author)}
+            alt=""
+            aria-hidden
+            className="w-8 h-8 rounded-full bg-gray-100"
+          />
+        )}
         <div className="flex-1 w-px bg-gray-200 mt-1" />
       </div>
 
@@ -50,8 +56,8 @@ export default function RedditCommentItem({
         </div>
 
         {showAiLabel && (
-          <p className="flex items-center gap-1 mt-1 text-[11px] font-semibold text-red-600">
-            <span aria-hidden>🤖</span>
+          <p className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded text-xs font-bold text-red-700 bg-red-50 border border-red-200">
+            <span aria-hidden className="text-sm">⚠️</span>
             {UI[lang].comment.aiLabel}
           </p>
         )}

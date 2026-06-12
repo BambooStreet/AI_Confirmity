@@ -198,7 +198,21 @@ export const preSurveyQuestions: SurveyQuestion[] = [
 // =============================================================================
 
 export const postSurveyQuestions: SurveyQuestion[] = [
-  // ---------- Page 1: 사회적 합의 지각 + 자기보고 동조 ----------
+  // ---------- Page 1: 영향 민감성(맨 앞 배치) + 사회적 합의 지각 + 자기보고 동조 ----------
+  {
+    id: "sc-1",
+    question: "나는 주변 사람들의 추천을 받으면 그대로 하는 편이다.",
+    type: "likert7",
+    required: true,
+    page: 1,
+  },
+  {
+    id: "sc-2",
+    question: "새로운 상황에서 나는 다른 사람들을 보며 무엇을 해야 할지 결정한다.",
+    type: "likert7",
+    required: true,
+    page: 1,
+  },
   {
     id: "psc-1",
     question:
@@ -390,20 +404,6 @@ export const postSurveyQuestions: SurveyQuestion[] = [
     id: "at-2",
     question:
       "다른 사람들도 당신과 같은 태도를 가져야 한다고 얼마나 생각합니까?",
-    type: "likert7",
-    required: true,
-    page: 3,
-  },
-  {
-    id: "sc-1",
-    question: "나는 주변 사람들의 추천을 받으면 그대로 하는 편이다.",
-    type: "likert7",
-    required: true,
-    page: 3,
-  },
-  {
-    id: "sc-2",
-    question: "새로운 상황에서 나는 다른 사람들을 보며 무엇을 해야 할지 결정한다.",
     type: "likert7",
     required: true,
     page: 3,

@@ -1,8 +1,9 @@
 import type { SurveyQuestion } from "@/data/survey-questions";
 
-// 영어판 설문 — 한국어판(survey-questions.ts)과 같은 id·page·type, 옵션 위치 1:1.
+// 영어판 설문 — 한국어판(survey-questions.ts)과 같은 id·page·type, 옵션 위치를 맞춤.
 // 인구통계 문항(demo-*)과 커뮤니티 예시는 미국 표본에 맞게 조정됨.
 // ⚠️ 번역 초벌 — 연구팀 검수 필요. 원척도(영문)가 있는 문항은 원문으로 교체 권장.
+// NOTE: pre-survey cd-3("...sincere opinions.")는 영어판 전용 — 한국어판에는 대응 문항 없음.
 
 export const likert7LabelsEn = [
   "Strongly disagree",
@@ -65,7 +66,7 @@ export const preSurveyQuestionsEn: SurveyQuestion[] = [
   {
     id: "C1",
     question:
-      "I have experience using online communities (e.g., Reddit, Discord, Tumblr, online forums).",
+      "I have experience with online communities (e.g., Reddit, Discord, Tumblr, online forums).",
     type: "multiple_choice",
     required: true,
     options: yesNoOptionsEn,
@@ -73,7 +74,7 @@ export const preSurveyQuestionsEn: SurveyQuestion[] = [
   },
   {
     id: "C2",
-    question: "I currently use online communities.",
+    question: "I am currently using online communities.",
     type: "multiple_choice",
     required: true,
     options: yesNoOptionsEn,
@@ -82,7 +83,7 @@ export const preSurveyQuestionsEn: SurveyQuestion[] = [
   },
   {
     id: "C3",
-    question: "How often do you use online communities?",
+    question: "How frequently do you use online communities?",
     type: "multiple_choice",
     required: true,
     options: frequency6OptionsEn,
@@ -116,7 +117,7 @@ export const preSurveyQuestionsEn: SurveyQuestion[] = [
   {
     id: "ai-lit-3",
     question:
-      "I can distinguish between AI-generated content and human-written content.",
+      "I can distinguish AI-generated content from human-written content.",
     type: "likert7",
     required: true,
     page: 3,
@@ -126,21 +127,28 @@ export const preSurveyQuestionsEn: SurveyQuestion[] = [
   {
     id: "cd-1",
     question:
-      "The opinions expressed in community comments reflect the general public's views on the issue well.",
+      "The opinions expressed in community comments accurately reflect the general public's views.",
     type: "likert7",
     required: true,
     page: 4,
   },
   {
     id: "cd-2",
-    question: "Comments with many upvotes in online communities are trustworthy.",
+    question: "Comments with many upvotes in a community are trustworthy.",
+    type: "likert7",
+    required: true,
+    page: 4,
+  },
+  {
+    id: "cd-3",
+    question: "Community comments contain sincere opinions.",
     type: "likert7",
     required: true,
     page: 4,
   },
   {
     id: "foi-1",
-    question: "I am reluctant to voice my opinion when it is in the minority.",
+    question: "I am reluctant to express my opinion when I believe it is in the minority.",
     type: "likert7",
     required: true,
     page: 4,
@@ -162,7 +170,7 @@ export const preSurveyQuestionsEn: SurveyQuestion[] = [
   {
     id: "foi-4",
     question:
-      "Even in anonymous communities, voicing an opinion different from the majority feels burdensome.",
+      "Even in anonymous communities, it is burdensome to express opinions different from the majority.",
     type: "likert7",
     required: true,
     page: 4,
@@ -174,7 +182,23 @@ export const preSurveyQuestionsEn: SurveyQuestion[] = [
 // =============================================================================
 
 export const postSurveyQuestionsEn: SurveyQuestion[] = [
-  // ---------- Page 1: Perceived social consensus + self-reported conformity ----------
+  // ---------- Page 1: Influence sensitivity (moved to front) + perceived social consensus + self-reported conformity ----------
+  {
+    id: "sc-1",
+    question:
+      "When people around me recommend something, I tend to just go with it.",
+    type: "likert7",
+    required: true,
+    page: 1,
+  },
+  {
+    id: "sc-2",
+    question:
+      "In new situations, I look to other people to decide what I should do.",
+    type: "likert7",
+    required: true,
+    page: 1,
+  },
   {
     id: "psc-1",
     question:
@@ -213,7 +237,7 @@ export const postSurveyQuestionsEn: SurveyQuestion[] = [
   {
     id: "psc-5",
     question:
-      "People who typically use online communities would share the claims made in the comments on the death-with-dignity post with people around them.",
+      "People who often use online communities would discuss the claims in the death-with-dignity post’s comments with others they know.",
     type: "likert7",
     required: true,
     page: 1,
@@ -267,7 +291,7 @@ export const postSurveyQuestionsEn: SurveyQuestion[] = [
   },
   {
     id: "pcs-5",
-    question: "Personally, my original view did not change.",
+    question: "Personally, I do not change my original view.",
     type: "likert7",
     required: true,
     page: 1,
@@ -312,7 +336,7 @@ export const postSurveyQuestionsEn: SurveyQuestion[] = [
   {
     id: "spe-1",
     question:
-      "Seeing the claims in the comments made me feel like I should change my choice.",
+      "I felt like I had to change my choice when I saw the argument in the comments.",
     type: "likert7",
     required: true,
     page: 2,
@@ -328,7 +352,7 @@ export const postSurveyQuestionsEn: SurveyQuestion[] = [
   {
     id: "spe-3",
     question:
-      "I felt a burden to go along with the opinions expressed in the comments.",
+      "I felt pressure to follow the opinions that appeared in the comments.",
     type: "likert7",
     required: true,
     page: 2,
@@ -337,24 +361,24 @@ export const postSurveyQuestionsEn: SurveyQuestion[] = [
   // ---------- Page 3: General attitudes & influence sensitivity ----------
   {
     id: "ac-1",
-    question: "In general, how certain are you about the positions you advocate?",
+    question: "In general, I am certain about the positions I advocate.",
     type: "likert7",
     required: true,
     page: 3,
     precedingNotice:
-      "[Note] The following questions ask about your usual attitudes and thoughts. Please answer honestly based on your everyday experience.",
+      "[Note] The following questions ask about your usual attitudes and thoughts. Please respond honestly about how much each statement reflects your usual attitude.",
   },
   {
     id: "ac-2",
     question:
-      "In general, how well do you think your attitudes reflect your thoughts and feelings?",
+      "In general, I think my attitudes reflect my thoughts and feelings very well.",
     type: "likert7",
     required: true,
     page: 3,
   },
   {
     id: "ac-3",
-    question: "In general, how clear do you feel about your choices?",
+    question: "Usually I am clear about my decision in my mind.",
     type: "likert7",
     required: true,
     page: 3,
@@ -370,22 +394,6 @@ export const postSurveyQuestionsEn: SurveyQuestion[] = [
     id: "at-2",
     question:
       "To what extent do you think other people should hold the same attitudes as you?",
-    type: "likert7",
-    required: true,
-    page: 3,
-  },
-  {
-    id: "sc-1",
-    question:
-      "When people around me recommend something, I tend to just go with it.",
-    type: "likert7",
-    required: true,
-    page: 3,
-  },
-  {
-    id: "sc-2",
-    question:
-      "In new situations, I look to other people to decide what I should do.",
     type: "likert7",
     required: true,
     page: 3,

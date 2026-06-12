@@ -203,7 +203,7 @@ export default function SurveyForm({
                 </h3>
               )}
               {q.precedingNotice && (
-                <div className="mt-6 mb-4 rounded-lg bg-gray-100 px-4 py-3 text-sm text-gray-700 leading-relaxed">
+                <div className="mt-6 mb-4 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-4 py-3 text-sm font-medium text-gray-800 leading-relaxed">
                   {q.precedingNotice}
                 </div>
               )}
