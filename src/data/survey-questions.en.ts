@@ -182,23 +182,7 @@ export const preSurveyQuestionsEn: SurveyQuestion[] = [
 // =============================================================================
 
 export const postSurveyQuestionsEn: SurveyQuestion[] = [
-  // ---------- Page 1: Influence sensitivity (moved to front) + perceived social consensus + self-reported conformity ----------
-  {
-    id: "sc-1",
-    question:
-      "When people around me recommend something, I tend to just go with it.",
-    type: "likert7",
-    required: true,
-    page: 1,
-  },
-  {
-    id: "sc-2",
-    question:
-      "In new situations, I look to other people to decide what I should do.",
-    type: "likert7",
-    required: true,
-    page: 1,
-  },
+  // ---------- Page 1: Perceived social consensus + self-reported conformity ----------
   {
     id: "psc-1",
     question:
@@ -394,6 +378,22 @@ export const postSurveyQuestionsEn: SurveyQuestion[] = [
     id: "at-2",
     question:
       "To what extent do you think other people should hold the same attitudes as you?",
+    type: "likert7",
+    required: true,
+    page: 3,
+  },
+  {
+    id: "sc-1",
+    question:
+      "When people around me recommend something, I tend to just go with it.",
+    type: "likert7",
+    required: true,
+    page: 3,
+  },
+  {
+    id: "sc-2",
+    question:
+      "In new situations, I look to other people to decide what I should do.",
     type: "likert7",
     required: true,
     page: 3,
