@@ -257,14 +257,17 @@ export default function AdminPage() {
 
   const [exporting, setExporting] = useState(false);
   const [showCsvHelp, setShowCsvHelp] = useState(false);
+  // CSV 내보내기 시 미완료(completedAt 없음) 참가자 제외 여부
+  const [onlyCompleted, setOnlyCompleted] = useState(false);
   async function downloadAllCsv() {
     setExporting(true);
     setError(null);
     try {
       const phaseQuery =
         phaseFilter === "all" ? "" : `&phase=${encodeURIComponent(phaseFilter)}`;
+      const completedQuery = onlyCompleted ? "&completed=true" : "";
       const res = await fetch(
-        `/api/admin/export?password=${encodeURIComponent(password)}${phaseQuery}`,
+        `/api/admin/export?password=${encodeURIComponent(password)}${phaseQuery}${completedQuery}`,
         { cache: "no-store" }
       );
       if (!res.ok) {
@@ -280,7 +283,7 @@ export default function AdminPage() {
         .slice(0, 16)
         .replace(/[-:T]/g, "")
         .replace(/(\d{8})(\d{4})/, "$1_$2");
-      a.download = `participants_${phaseFilter}_${stamp}.csv`;
+      a.download = `participants_${phaseFilter}${onlyCompleted ? "_completed" : ""}_${stamp}.csv`;
       a.click();
       URL.revokeObjectURL(url);
     } catch {
@@ -377,6 +380,15 @@ export default function AdminPage() {
         <div className="flex items-center gap-2">
           {tab === "sessions" && (
             <>
+              <label className="flex items-center gap-1 text-xs text-gray-700 select-none cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={onlyCompleted}
+                  onChange={(e) => setOnlyCompleted(e.target.checked)}
+                  className="accent-blue-600"
+                />
+                완료만
+              </label>
               <button
                 onClick={() => void downloadAllCsv()}
                 disabled={exporting}
@@ -384,9 +396,11 @@ export default function AdminPage() {
               >
                 {exporting
                   ? "내보내는 중…"
-                  : phaseFilter === "all"
-                    ? "전체 CSV 다운로드"
-                    : `${phaseLabel(phaseFilter)} CSV 다운로드`}
+                  : `${
+                      phaseFilter === "all"
+                        ? "전체"
+                        : phaseLabel(phaseFilter)
+                    }${onlyCompleted ? " · 완료만" : ""} CSV 다운로드`}
               </button>
               <button
                 onClick={() => setShowCsvHelp((v) => !v)}

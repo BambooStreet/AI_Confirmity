@@ -26,12 +26,18 @@ export async function GET(request: NextRequest) {
     });
   }
 
+  const searchParams = new URL(request.url).searchParams;
   // ?phase=test|pilot|main 으로 특정 단계만 내보내기 (없으면 전체)
-  const phaseParam = new URL(request.url).searchParams.get("phase");
+  const phaseParam = searchParams.get("phase");
   const phase = isPhase(phaseParam) ? phaseParam : null;
+  // ?completed=true 면 완료한 참가자(completedAt 있음)만 내보낸다
+  const onlyCompleted = searchParams.get("completed") === "true";
 
   const participants = await prisma.participant.findMany({
-    where: phase ? { phase } : undefined,
+    where: {
+      ...(phase ? { phase } : {}),
+      ...(onlyCompleted ? { completedAt: { not: null } } : {}),
+    },
     orderBy: { startedAt: "asc" },
     include: {
       responses: { orderBy: { createdAt: "asc" } },
@@ -121,7 +127,9 @@ export async function GET(request: NextRequest) {
     now.getMinutes()
   ).padStart(2, "0")}`;
 
-  const filePrefix = phase ? `participants_${phase}` : "participants_all";
+  const filePrefix =
+    (phase ? `participants_${phase}` : "participants_all") +
+    (onlyCompleted ? "_completed" : "");
   return new Response(csv, {
     status: 200,
     headers: {
