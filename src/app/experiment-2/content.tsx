@@ -163,9 +163,8 @@ export const EXP2_CONTENT: Record<Lang, Exp2Content> = {
           여러분은 어떻게 생각하세요? 찬성/반대 어느 쪽이든 이유가 궁금해요.
         </p>
         <p className="mt-3 text-sm text-gray-500">
-          세 줄 요약: 영상만 보면 &lsquo;당연히 찬성&rsquo; 같은데, 막상 파고드니
-          간단하지가 않음. 존엄사 합법화, 여러분은 찬성/반대 어느 쪽이고 이유가
-          뭐예요?
+          세 줄 요약: 존엄사 합법화, 찬성도 반대도 나름 일리가 있어서 못
+          정하겠음. 여러분은 어느 쪽이고 이유가 뭐예요?
         </p>
       </>
     ),
@@ -315,9 +314,8 @@ export const EXP2_CONTENT: Record<Lang, Exp2Content> = {
           reasons.
         </p>
         <p className="mt-3 text-sm text-gray-500">
-          TL;DR: the video made it sound like an obvious yes, but the more I
-          think it through the messier it gets. Where do you land on legalizing
-          it, and why?
+          TL;DR: honestly both sides make fair points and I can&apos;t decide.
+          Where do you land on legalizing it, and why?
         </p>
       </>
     ),
