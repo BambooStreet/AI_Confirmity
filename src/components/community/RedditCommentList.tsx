@@ -22,7 +22,7 @@ type RedditCommentListProps = {
   participantId: string;
   inputPlaceholder?: string;
   inputButtonLabel?: string;
-  inputMinLength?: number;
+  inputMinWords?: number;
   showInput?: boolean;
   onUserCommentSubmitted?: (content: string) => void;
 };
@@ -33,7 +33,7 @@ export default function RedditCommentList({
   participantId,
   inputPlaceholder,
   inputButtonLabel,
-  inputMinLength,
+  inputMinWords,
   showInput = true,
   onUserCommentSubmitted,
 }: RedditCommentListProps) {
@@ -129,7 +129,7 @@ export default function RedditCommentList({
             isSubmitting={isSubmitting}
             placeholder={inputPlaceholder}
             buttonLabel={inputButtonLabel}
-            minLength={inputMinLength}
+            minWords={inputMinWords}
           />
         </div>
       )}

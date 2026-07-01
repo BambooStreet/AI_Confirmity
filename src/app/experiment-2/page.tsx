@@ -502,6 +502,7 @@ export default function ExperimentTwoPage() {
             participantId={participantId}
             inputPlaceholder={c.inputPlaceholder}
             inputButtonLabel="Comment"
+            inputMinWords={lang === "en" ? 5 : 1}
             onUserCommentSubmitted={() => setHasCommented(true)}
           />
 

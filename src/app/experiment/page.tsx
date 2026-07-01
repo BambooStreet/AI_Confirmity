@@ -327,6 +327,7 @@ export default function ExperimentPage() {
             participantId={participantId}
             inputPlaceholder={c.inputPlaceholder}
             inputButtonLabel="Comment"
+            inputMinWords={lang === "en" ? 3 : 1}
             onUserCommentSubmitted={() => setHasCommented(true)}
           />
 

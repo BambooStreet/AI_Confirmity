@@ -9,31 +9,49 @@ type RedditCommentInputProps = {
   isSubmitting?: boolean;
   placeholder?: string;
   buttonLabel?: string;
-  minLength?: number;
+  minWords?: number;
 };
+
+function countWords(text: string): number {
+  const trimmed = text.trim();
+  return trimmed ? trimmed.split(/\s+/).length : 0;
+}
 
 export default function RedditCommentInput({
   onSubmit,
   isSubmitting = false,
   placeholder,
   buttonLabel = "Comment",
-  minLength = 1,
+  minWords = 1,
 }: RedditCommentInputProps) {
   const lang = useLang();
   const resolvedPlaceholder = placeholder ?? UI[lang].comment.placeholder;
   const [content, setContent] = useState("");
   const [focused, setFocused] = useState(false);
 
+  const wordCount = countWords(content);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const trimmed = content.trim();
-    if (trimmed.length < minLength) return;
-    onSubmit(trimmed);
+    if (wordCount < minWords) return;
+    onSubmit(content.trim());
     setContent("");
     setFocused(false);
   };
 
-  const disabled = content.trim().length < minLength || isSubmitting;
+  const disabled = wordCount < minWords || isSubmitting;
+  const met = wordCount >= minWords;
+  const remaining = minWords - wordCount;
+  // 요구 단어 수를 항상 노출해 피험자가 사전에 인지하도록 함 (최소치가 2단어 이상일 때만)
+  const showCounter = minWords > 1;
+  const counter =
+    lang === "en"
+      ? met
+        ? `✓ ${minWords} words reached`
+        : `Minimum ${minWords} words (${remaining} more)`
+      : met
+        ? `✓ 최소 ${minWords}단어 충족`
+        : `최소 ${minWords}단어 필요 (${remaining}단어 더)`;
 
   return (
     <form
@@ -48,6 +66,17 @@ export default function RedditCommentInput({
           u/{UI[lang].comment.selfName}
         </span>
       </p>
+      {showCounter && (
+        <p
+          className={`mx-3 mt-1.5 inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${
+            met
+              ? "bg-green-50 text-green-700"
+              : "bg-amber-100 text-amber-800"
+          }`}
+        >
+          {counter}
+        </p>
+      )}
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
