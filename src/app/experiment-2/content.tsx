@@ -131,8 +131,8 @@ export const EXP2_CONTENT: Record<Lang, Exp2Content> = {
     postBody: (
       <>
         <p>
-          얼마 전에 우연히 본 쇼츠 하나가 계속 머릿속에 남아서 같이
-          이야기해보고 싶어 글 올려요.
+          며칠 전에 알고리즘 타고 뜬 쇼츠 하나가 계속 머릿속에 맴돌아서, 혼자
+          생각만 하다가 결론이 안 나서 글 올려봐요.
         </p>
         <p>
           영상에서는 한 의사가 이런 이야기를 하더라고요. 말기 환자에게는
@@ -162,6 +162,11 @@ export const EXP2_CONTENT: Record<Lang, Exp2Content> = {
         <p className="font-medium text-gray-900">
           여러분은 어떻게 생각하세요? 찬성/반대 어느 쪽이든 이유가 궁금해요.
         </p>
+        <p className="mt-3 text-sm text-gray-500">
+          세 줄 요약: 영상만 보면 &lsquo;당연히 찬성&rsquo; 같은데, 막상 파고드니
+          간단하지가 않음. 존엄사 합법화, 여러분은 찬성/반대 어느 쪽이고 이유가
+          뭐예요?
+        </p>
       </>
     ),
     inputPlaceholder: "존엄사 합법화에 대한 본인의 의견을 자유롭게 적어주세요…",
@@ -177,50 +182,50 @@ export const EXP2_CONTENT: Record<Lang, Exp2Content> = {
     title: "Task 2",
     stageIndicator: (stage) => `Step ${stage} / 5`,
     wrongTitle:
-      "Some answers were incorrect. Please read the explanation below once more.",
+      "That wasn't quite right. Take another look at the explanation below.",
     wrongCountdown: (sec) =>
       `The questions you missed will be shown again automatically in ${sec}s.`,
     autoAdvance: (sec) => `Continuing automatically in ${sec}s`,
-    readIntro: "Please read the passage below and answer the questions that follow.",
-    defTitle: "What is death with dignity?",
+    readIntro: "Have a read through the explanation below, then answer the questions that follow.",
+    defTitle: "What is “death with dignity”?",
     defBody: (
       <>
         <p>
-          <strong>Death with dignity</strong> refers to a patient with no chance
-          of recovery either discontinuing meaningless life-sustaining
-          treatment, or ending their own life with the help of medical
-          professionals, according to their own wishes.
+          <strong>Death with dignity</strong> is about letting a patient with
+          no realistic chance of recovery decide, on their own terms, how their
+          life ends — either by stopping life-sustaining treatment that no
+          longer serves a purpose, or by ending their life with a
+          doctor&apos;s help.
         </p>
-        <p>It is generally divided into two types:</p>
+        <p>It generally comes in two forms:</p>
         <ul className="list-disc pl-5 space-y-1">
           <li>
-            <strong>Passive (withdrawal of life-sustaining treatment)</strong>:
-            Discontinuing treatments that prolong the dying process, such as
-            ventilators or CPR. In many countries this is already
-            institutionalized through advance-directive and end-of-life care
-            laws.
+            <strong>Passive (withdrawing life-sustaining treatment)</strong>:
+            Stopping treatments that only drag out the dying process, like
+            ventilators or CPR. Plenty of countries already allow this through
+            advance-directive and end-of-life care laws.
           </li>
           <li>
-            <strong>Active (assisted dying)</strong>: Medical professionals
-            helping a patient die, e.g., with medication, at the patient&apos;s
-            request. This remains illegal in many jurisdictions, and
-            legislative debates are ongoing.
+            <strong>Active (assisted dying)</strong>: A doctor actively helping
+            a patient die at their request, usually with medication. This is
+            still illegal in many places, and it&apos;s what most of the
+            ongoing legal debates are really about.
           </li>
         </ul>
         <p>
-          Supporters emphasize the patient&apos;s{" "}
-          <strong>right to self-determination</strong> and relief from
-          suffering, while opponents raise concerns about{" "}
-          <strong>medical ethics</strong>, potential abuse, and the burden on
-          medical professionals.
+          Supporters lean on the patient&apos;s{" "}
+          <strong>right to decide for themselves</strong> and on sparing them
+          needless suffering. Critics worry about what it does to{" "}
+          <strong>medical ethics</strong>, how easily it could be abused, and
+          the weight it puts on the doctors involved.
         </p>
       </>
     ),
-    quizTitle: "Comprehension Quiz",
+    quizTitle: "Quick comprehension check",
     quizDescFirst:
-      "Based on the explanation on the previous page, choose the correct answer for both questions. You can only proceed when both are correct.",
+      "Using the explanation from the previous page, pick the right answer for both. You can only move on once both are correct.",
     quizDescRetry:
-      "Please retry the questions you missed. You can only proceed when all are correct.",
+      "Give the ones you missed another try — you can move on once they're all correct.",
     q1: {
       question: "Who is death with dignity intended for?",
       options: [
@@ -241,10 +246,10 @@ export const EXP2_CONTENT: Record<Lang, Exp2Content> = {
       answer: "Discontinuing life-sustaining treatment such as a ventilator",
     },
     submit: "Submit",
-    stage3Title: "Please indicate your opinion on death with dignity.",
+    stage3Title: "Where do you stand on death with dignity?",
     stage3Desc: (
       <>
-        Choose the option closest to your own view on{" "}
+        Pick the option that comes closest to how you feel about{" "}
         <strong>legalizing death with dignity</strong>.
       </>
     ),
@@ -262,14 +267,15 @@ export const EXP2_CONTENT: Record<Lang, Exp2Content> = {
     confidenceHigh: "7 = Extremely confident",
     postedAgo: "6h ago",
     postTitle:
-      "Saw a short about death with dignity… what does everyone think?",
+      "Saw a short about death with dignity and now I can't stop thinking about it… where do you all land?",
     videoSrc: "https://www.youtube.com/embed/3Ai462Sg7X0",
     videoTitle: "Video about death with dignity",
     postBody: (
       <>
         <p>
-          A short I stumbled on recently has been stuck in my head, so I wanted
-          to post and talk it through with you all.
+          A short the algorithm threw at me a few days ago has been living
+          rent-free in my head, and I couldn&apos;t settle it on my own, so
+          here I am.
         </p>
         <p>
           In the video, a doctor says terminal patients should have the right
@@ -307,6 +313,11 @@ export const EXP2_CONTENT: Record<Lang, Exp2Content> = {
         <p className="font-medium text-gray-900">
           What do you all think? For or against, I&apos;d love to hear your
           reasons.
+        </p>
+        <p className="mt-3 text-sm text-gray-500">
+          TL;DR: the video made it sound like an obvious yes, but the more I
+          think it through the messier it gets. Where do you land on legalizing
+          it, and why?
         </p>
       </>
     ),

@@ -5,37 +5,43 @@ import { useRouter } from "next/navigation";
 import PageWrapper from "@/components/layout/PageWrapper";
 import { useLang } from "@/lib/useLang";
 
-// ⚠️ EN은 한국어 동의서의 직역 초벌입니다 — IRB 영문 승인 문구 확보 시 교체하세요.
 const CONTENT = {
   ko: {
     title: "연구 참여 동의서",
     sections: [
       {
         heading: "연구 제목",
-        paragraphs: ["온라인 커뮤니티 게시글·댓글에 대한 이용자 인식 연구"],
+        bullets: ["온라인 커뮤니티 게시글·댓글에 대한 이용자 인식 연구"],
       },
       {
         heading: "연구 절차",
-        paragraphs: [
-          "본 연구에 참여하시면 먼저 인적 사항, 평소 온라인 커뮤니티 이용 행태, AI에 대한 인식 등을 묻는 간단한 사전 설문에 응답하시게 됩니다. 이후 두 가지 본실험에 차례로 참여하시며, 각 실험에서는 온라인 커뮤니티 형태로 제시되는 게시글과 댓글을 읽고 본인의 의견을 직접 댓글로 남긴 뒤 관련 질문에 응답하시게 됩니다. 마지막으로 사후 설문에 응답하시면 모든 절차가 완료됩니다. 전체 소요시간은 약 10-15분입니다.",
+        intro: "본 연구는 아래 순서로 진행되며, 전체 소요시간은 약 10~15분입니다.",
+        bullets: [
+          "사전 설문: 인적 사항, 평소 온라인 커뮤니티 이용 행태, AI에 대한 인식 등을 묻는 간단한 설문에 응답합니다.",
+          "본실험(2회): 커뮤니티 형태로 제시되는 게시글과 댓글을 읽고, 본인의 의견을 직접 댓글로 남긴 뒤 관련 질문에 응답합니다.",
+          "사후 설문: 마무리 설문에 응답하면 모든 절차가 완료됩니다.",
         ],
       },
       {
         heading: "개인정보 보호",
-        paragraphs: [
-          "수집된 모든 데이터는 익명으로 처리되며, 연구 목적으로만 사용됩니다. 개인을 식별할 수 있는 정보는 수집하지 않습니다.",
+        bullets: [
+          "수집된 모든 데이터는 익명으로 처리됩니다.",
+          "수집된 데이터는 연구 목적으로만 사용됩니다.",
+          "개인을 식별할 수 있는 정보는 수집하지 않습니다.",
         ],
       },
       {
         heading: "자발적 참여",
-        paragraphs: [
-          "본 연구 참여는 자발적이며, 언제든지 참여를 중단할 수 있습니다. 참여 중단으로 인한 불이익은 전혀 없습니다.",
+        bullets: [
+          "본 연구 참여는 전적으로 자발적입니다.",
+          "참여 도중 언제든지 중단할 수 있습니다.",
+          "참여를 중단하더라도 어떠한 불이익도 없습니다.",
         ],
       },
       {
         heading: "연구자 연락처",
-        paragraphs: [
-          "본 연구에 대한 문의사항이 있으시면 아래 연락처로 문의해주세요.",
+        intro: "본 연구에 대한 문의사항이 있으시면 아래로 연락해 주세요.",
+        bullets: [
           "연구 책임자: 이해윤",
           "이메일: hailey99@g.skku.edu",
           "소속: 성균관대학교 인터랙션사이언스학과",
@@ -52,32 +58,39 @@ const CONTENT = {
     sections: [
       {
         heading: "Study Title",
-        paragraphs: [
-          "A Study of User Perceptions of Posts and Comments in Online Communities",
+        bullets: [
+          "Understanding how people respond to posts and comments in online communities",
         ],
       },
       {
-        heading: "Procedure",
-        paragraphs: [
-          "If you take part in this study, you will first complete a short pre-survey about your demographics, your typical use of online communities, and your perceptions of AI. You will then take part in two main tasks. In each task, you will read a post and its comments presented in an online community format, leave a comment with your own opinion, and answer related questions. Finally, you will complete a short post-survey, which concludes the study. The entire study takes about 10–15 minutes.",
+        heading: "What You'll Do",
+        intro: "The study runs in the following steps and takes about 10–15 minutes in total.",
+        bullets: [
+          "Pre-survey: a few background questions about you, how you usually use online communities, and how you view AI.",
+          "Main tasks (twice): read a community-style post and its comments, share your own opinion as a comment, then answer a few follow-up questions.",
+          "Post-survey: a short wrap-up questionnaire completes the study.",
         ],
       },
       {
-        heading: "Privacy",
-        paragraphs: [
-          "All collected data will be anonymized and used for research purposes only. No personally identifiable information will be collected.",
+        heading: "Your Privacy",
+        bullets: [
+          "Everything you share is stored anonymously.",
+          "Your responses are used only for research.",
+          "We never collect anything that could identify you personally.",
         ],
       },
       {
-        heading: "Voluntary Participation",
-        paragraphs: [
-          "Participation in this study is voluntary, and you may withdraw at any time. There is no penalty for withdrawing.",
+        heading: "Taking Part Is Your Choice",
+        bullets: [
+          "Joining this study is entirely voluntary.",
+          "You can stop at any point along the way.",
+          "Choosing to stop comes with no penalty of any kind.",
         ],
       },
       {
-        heading: "Researcher Contact",
-        paragraphs: [
-          "If you have any questions about this study, please contact:",
+        heading: "Questions?",
+        intro: "If anything about the study is unclear, feel free to reach out.",
+        bullets: [
           "Principal Researcher: Haeyoon Lee",
           "Email: hailey99@g.skku.edu",
           "Affiliation: Department of Interaction Science, Sungkyunkwan University",
@@ -85,7 +98,7 @@ const CONTENT = {
       },
     ],
     checkbox:
-      "I have read and fully understood the information above, and I voluntarily agree to participate in this study.",
+      "I have read and fully understood the information above, and I voluntarily agree to take part in this study.",
     submit: "Agree and Start",
     submitting: "Processing...",
   },
@@ -124,11 +137,14 @@ export default function ConsentPage() {
             <h2 className="text-lg font-semibold text-gray-900">
               {section.heading}
             </h2>
-            {section.paragraphs.map((p, i) => (
-              <p key={i} className={i > 0 ? "mt-0" : undefined}>
-                {p}
-              </p>
-            ))}
+            {"intro" in section && section.intro && (
+              <p className="mb-1">{section.intro}</p>
+            )}
+            <ul className="list-disc pl-5 space-y-1">
+              {section.bullets.map((b, i) => (
+                <li key={i}>{b}</li>
+              ))}
+            </ul>
           </div>
         ))}
       </div>

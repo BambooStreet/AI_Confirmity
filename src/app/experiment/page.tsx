@@ -30,15 +30,17 @@ const CONTENT = {
     saving: "저장 중…",
     next: "다음",
     postedAgo: "30분 전",
-    postTitle: "이 선분 길이 비교, 기준선과 같은 게 어느 거예요? (A/B/C)",
+    postTitle: "나만 헷갈리는 건가…? ★ 기준선이랑 길이 똑같은 거, A/B/C 중에 뭐예요?",
     postBodyIntro: (
       <>
-        앞서 보여드린 <strong>기준 선분(★)</strong>과 같은 길이의 비교선이 뭔지
-        의견 좀 모아봅시다. 댓글로 본인 답이랑 이유 같이 남겨주세요.
+        아까 위에서 잠깐 봤던 <strong>기준 선분(★)</strong> 기억나죠? 그거랑
+        길이가 똑같은 비교선이 아래 A·B·C 중에 뭔지 좀 봐주세요. 저는 감은 오는데
+        은근 헷갈리네요 ㅋㅋ 본인 답이랑 왜 그렇게 봤는지 이유도 같이 남겨주면
+        감사하겠습니다 🙏
       </>
     ),
     postNotice:
-      "※ '기준 선분'은 단계 1에서 잠깐 보여드렸던 ★ 표시의 선분을 말합니다. 그 선분과 길이가 같은 비교선(A·B·C)을 찾아주세요.",
+      "※ '기준 선분'은 맨 처음에 잠깐 떴던 ★ 표시 선분이에요. 그 선분이랑 길이가 같은 비교선(A·B·C)을 골라주시면 됩니다.",
     inputPlaceholder: "본인 답과 이유를 자유롭게 적어주세요…",
     mustComment: "다음 단계로 넘어가려면 본인의 의견을 댓글로 남겨주세요.",
     stage4Title: "다시 한 번 골라주세요",
@@ -63,16 +65,17 @@ const CONTENT = {
     next: "Next",
     postedAgo: "30m ago",
     postTitle:
-      "Line length comparison — which one matches the reference line? (A/B/C)",
+      "Am I the only one finding this tricky? Which line (A/B/C) is the same length as the reference (★)?",
     postBodyIntro: (
       <>
-        Let&apos;s gather opinions on which comparison line is the same length
-        as the <strong>reference line (★)</strong> shown earlier. Leave a
-        comment with your answer and reasoning.
+        Ok so that <strong>reference line (★)</strong> from a second ago — which
+        of A, B, or C below is actually the same length as it? I&apos;ve got a
+        gut feeling but honestly it&apos;s throwing me off a bit lol. Drop your
+        pick and a quick word on why 🙏
       </>
     ),
     postNotice:
-      "※ The 'reference line' is the ★-marked line briefly shown in Step 1. Find the comparison line (A, B, or C) that matches its length.",
+      "※ The 'reference line' is the ★-marked one that flashed up at the very start. Just pick the comparison line (A, B, or C) that's the same length as it.",
     inputPlaceholder: "Share your answer and reasoning freely…",
     mustComment: "Leave a comment with your opinion to move on to the next step.",
     stage4Title: "Choose once more",
@@ -305,7 +308,7 @@ export default function ExperimentPage() {
         <section>
           <RedditPost
             subreddit="visualperception"
-            postedBy="line_check_bot"
+            postedBy="not_sure_lol"
             postedAgo={c.postedAgo}
             title={c.postTitle}
             score={128}

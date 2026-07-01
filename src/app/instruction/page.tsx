@@ -33,29 +33,29 @@ const CONTENT = {
     start: "실험 시작하기",
   },
   en: {
-    title: "Instructions",
-    flowTitle: "Overview",
+    title: "Before You Begin",
+    flowTitle: "What to expect",
     flowBody:
-      "This study consists of two tasks. Both tasks simulate sharing opinions in an online community. Please participate naturally, just as you would when reading posts and leaving comments online.",
+      "There are two tasks ahead, and both play out like a real online community—you'll read posts and reply with comments. Just take part the way you normally would online.",
     tasks: [
       {
         title: "Task 1 — Line Comparison",
-        desc: "A short visual perception task where you pick the comparison line that matches the length of a reference line. You will look at the lines, choose an answer, see other people's opinions, and then make your choice once more.",
+        desc: "A quick visual task: compare a reference line against a few others and pick the one that's the same length. You'll make a first choice, see what others said, then choose again.",
       },
       {
         title: "Task 2 — Death with Dignity Discussion",
-        desc: "You will read a community post and comments debating the legalization of death with dignity (assisted dying), then write a comment sharing your own view.",
+        desc: "Read a community post and the comments debating whether death with dignity (assisted dying) should be legalized, then leave a comment with your own take.",
       },
       {
         title: "Post-Survey",
-        desc: "After both tasks, you will answer a short post-survey, which completes the study.",
+        desc: "Once both tasks are done, a short survey wraps things up.",
       },
     ],
-    aiNoticeTitle: "The comments are all written by AI",
+    aiNoticeTitle: "Every comment here was written by AI",
     aiNoticeBody:
-      "In both tasks, the other people's comments you will see are all written by AI agents. Each of them carries a ⚠️ 'This comment was written by AI' label, so please check it as you read.",
-    noteLabel: "Note:",
-    note: "There are no right or wrong answers. Please respond naturally, based on how you usually feel.",
+      "In both tasks, all the comments from “other people” were actually written by AI agents. Each one is tagged with a ⚠️ 'This comment was written by AI' label—keep an eye out for it as you read.",
+    noteLabel: "Keep in mind:",
+    note: "There's no right or wrong answer here. Just go with whatever feels true to you.",
     start: "Start the Study",
   },
 } as const;
