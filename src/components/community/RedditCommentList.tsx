@@ -75,6 +75,21 @@ export default function RedditCommentList({
 
   return (
     <section className="mt-4 bg-white border border-gray-200 rounded-md p-4">
+      {showAiLabel && (
+        <div className="mb-4 flex gap-3 rounded-lg border-2 border-red-400 bg-red-50 px-4 py-3.5 shadow-sm ring-1 ring-red-200">
+          <span aria-hidden className="text-base leading-none mt-0.5">
+            ⚠️
+          </span>
+          <div>
+            <p className="text-sm font-extrabold uppercase tracking-wide text-red-700">
+              {UI[lang].comment.aiBannerTitle}
+            </p>
+            <p className="mt-1 text-xs font-medium leading-relaxed text-red-800">
+              {UI[lang].comment.aiBannerBody}
+            </p>
+          </div>
+        </div>
+      )}
       <div className="flex items-center gap-2 pb-3 border-b border-gray-200">
         <span className="text-sm font-bold text-gray-900">
           {totalComments} Comments

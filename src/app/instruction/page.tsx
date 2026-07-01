@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import PageWrapper from "@/components/layout/PageWrapper";
 import { useLang } from "@/lib/useLang";
+import { useExperimentSession } from "@/lib/useExperimentSession";
 
 const CONTENT = {
   ko: {
@@ -24,6 +25,9 @@ const CONTENT = {
         desc: "두 과제가 끝나면 짧은 사후 설문에 응답하고 실험이 마무리됩니다.",
       },
     ],
+    aiNoticeTitle: "댓글은 모두 AI가 작성했습니다",
+    aiNoticeBody:
+      "두 과제에서 보게 될 다른 사람들의 댓글은 모두 AI 에이전트가 작성한 것입니다. 각 댓글에는 ⚠️ 'AI가 작성한 댓글입니다' 라벨이 붙어 있으니, 읽으실 때 확인해주세요.",
     noteLabel: "참고:",
     note: "정답이나 오답은 없습니다. 평소 본인이 느끼는 대로 자연스럽게 답해주시면 됩니다.",
     start: "실험 시작하기",
@@ -47,6 +51,9 @@ const CONTENT = {
         desc: "After both tasks, you will answer a short post-survey, which completes the study.",
       },
     ],
+    aiNoticeTitle: "The comments are all written by AI",
+    aiNoticeBody:
+      "In both tasks, the other people's comments you will see are all written by AI agents. Each of them carries a ⚠️ 'This comment was written by AI' label, so please check it as you read.",
     noteLabel: "Note:",
     note: "There are no right or wrong answers. Please respond naturally, based on how you usually feel.",
     start: "Start the Study",
@@ -57,6 +64,7 @@ export default function InstructionPage() {
   const router = useRouter();
   const lang = useLang();
   const c = CONTENT[lang];
+  const { hasAiLabel } = useExperimentSession();
 
   const handleNext = async () => {
     const participantId = localStorage.getItem("participantId");
@@ -93,6 +101,22 @@ export default function InstructionPage() {
             </div>
           ))}
         </div>
+
+        {hasAiLabel && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-2.5">
+            <span aria-hidden className="text-base leading-none mt-0.5">
+              ⚠️
+            </span>
+            <div>
+              <p className="text-sm font-bold text-red-800">
+                {c.aiNoticeTitle}
+              </p>
+              <p className="mt-1 text-sm leading-relaxed text-red-700">
+                {c.aiNoticeBody}
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <p className="text-sm text-yellow-800">

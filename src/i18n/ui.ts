@@ -30,6 +30,9 @@ type UiDict = {
     /** "Comment as u/___" 의 본인 표시명 */
     selfName: string;
     aiLabel: string;
+    /** 댓글 목록 상단에 뜨는 AI 라벨 설명 배너 (AI 라벨 조건에서만 노출) */
+    aiBannerTitle: string;
+    aiBannerBody: string;
   };
   landing: {
     preparing: string;
@@ -66,6 +69,9 @@ export const UI: Record<Lang, UiDict> = {
       placeholder: "본인의 의견을 댓글로 남겨주세요…",
       selfName: "나",
       aiLabel: "AI가 작성한 댓글입니다",
+      aiBannerTitle: "이 댓글 중 일부는 AI가 작성했습니다",
+      aiBannerBody:
+        "아래 댓글 중 ⚠️ 'AI가 작성한 댓글입니다' 라벨이 붙은 것은 실제 사람이 아니라 AI 에이전트가 작성한 댓글입니다. 라벨을 확인하며 읽어주세요.",
     },
     landing: {
       preparing: "실험 환경을 준비하고 있습니다...",
@@ -100,6 +106,9 @@ export const UI: Record<Lang, UiDict> = {
       placeholder: "Share your opinion in a comment…",
       selfName: "me",
       aiLabel: "This comment was written by AI",
+      aiBannerTitle: "Some of these comments were written by AI",
+      aiBannerBody:
+        "Comments marked with the ⚠️ 'This comment was written by AI' label were written by AI agents, not by real people. Please keep an eye on the labels as you read.",
     },
     landing: {
       preparing: "Preparing the study environment...",
