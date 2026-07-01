@@ -16,7 +16,7 @@ import { EXP2_CONTENT } from "./content";
 
 type Stage = 1 | 2 | 3 | 4 | 5;
 
-const QUIZ_HOLD_SECONDS = 15;
+const QUIZ_HOLD_SECONDS = 10;
 
 async function saveEuthanasiaResponse(
   participantId: string,
