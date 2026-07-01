@@ -293,7 +293,7 @@ export const postSurveyQuestions: SurveyQuestion[] = [
     page: 1,
   },
 
-  // ---------- Page 2: 댓글 설득력 + 사회적 압력 ----------
+  // ---------- Page 2: 댓글 설득력 + 사회적 압력 + 심리적 반발 ----------
   {
     id: "pp-1",
     question: "커뮤니티 댓글은 나의 최종 선택에 영향을 줬다.",
@@ -347,6 +347,29 @@ export const postSurveyQuestions: SurveyQuestion[] = [
   {
     id: "spe-3",
     question: "댓글에 나타난 의견을 따라야 한다는 부담이 느껴졌다.",
+    type: "likert7",
+    required: true,
+    page: 2,
+  },
+
+  // --- 심리적 반발(Reactance) ---
+  {
+    id: "reac-1",
+    question: "댓글을 읽는 동안 그 주장에 반대되는 점들이 떠올랐다.",
+    type: "likert7",
+    required: true,
+    page: 2,
+  },
+  {
+    id: "reac-2",
+    question: "댓글을 읽으면서 속으로 그 주장을 반박하고 있었다.",
+    type: "likert7",
+    required: true,
+    page: 2,
+  },
+  {
+    id: "reac-3",
+    question: "그 댓글의 주장에서 허점을 찾으려 했다.",
     type: "likert7",
     required: true,
     page: 2,
@@ -440,7 +463,7 @@ export const postSurveyQuestions: SurveyQuestion[] = [
     question: "댓글 수는 다음 중 어느 범위에 해당했습니까?",
     type: "multiple_choice",
     required: true,
-    options: ["5~10개 (Less)", "15~20개 (Moderate)", "25~30개 (Large)"],
+    options: ["3개 (Less)", "9개 (Moderate)", "27개 (Large)"],
     page: 4,
   },
 ];

@@ -281,7 +281,7 @@ export const postSurveyQuestionsEn: SurveyQuestion[] = [
     page: 1,
   },
 
-  // ---------- Page 2: Comment persuasiveness + social pressure ----------
+  // ---------- Page 2: Comment persuasiveness + social pressure + reactance ----------
   {
     id: "pp-1",
     question: "The community comments influenced my final choice.",
@@ -337,6 +337,30 @@ export const postSurveyQuestionsEn: SurveyQuestion[] = [
     id: "spe-3",
     question:
       "I felt pressure to follow the opinions that appeared in the comments.",
+    type: "likert7",
+    required: true,
+    page: 2,
+  },
+
+  // --- Reactance ---
+  {
+    id: "reac-1",
+    question:
+      "While reading the comments, points against the claim came to mind.",
+    type: "likert7",
+    required: true,
+    page: 2,
+  },
+  {
+    id: "reac-2",
+    question: "As I read the comments, I was mentally refuting the claim.",
+    type: "likert7",
+    required: true,
+    page: 2,
+  },
+  {
+    id: "reac-3",
+    question: "I tried to find flaws in the claims made in the comments.",
     type: "likert7",
     required: true,
     page: 2,
@@ -432,7 +456,7 @@ export const postSurveyQuestionsEn: SurveyQuestion[] = [
     question: "Which range did the number of comments fall into?",
     type: "multiple_choice",
     required: true,
-    options: ["5–10 (Less)", "15–20 (Moderate)", "25–30 (Large)"],
+    options: ["3 (Less)", "9 (Moderate)", "27 (Large)"],
     page: 4,
   },
 ];
