@@ -491,7 +491,7 @@ export default function AdminPage() {
                     <li><code className="text-gray-900">phase</code> — 실험 단계 (<code>test</code> 내부 테스트 · <code>pilot</code> 파일럿 · <code>main</code> 본실험)</li>
                     <li><code className="text-gray-900">external_id</code> — 외부 패널(CloudResearch 등) 참가자 식별자. 승인 시 이 값으로 매칭</li>
                     <li><code className="text-gray-900">external_meta</code> — 진입 URL 쿼리스트링 전체 (JSON)</li>
-                    <li><code className="text-gray-900">condition</code> — 실험 조건 (예: <code>ai_10</code> = AI 라벨 표시 + 댓글 10개, <code>no_ai_5</code> = 라벨 없음 + 5개)</li>
+                    <li><code className="text-gray-900">condition</code> — 실험 조건 (예: <code>ai_9</code> = AI 라벨 표시 + 댓글 9개, <code>no_ai_3</code> = 라벨 없음 + 3개)</li>
                     <li><code className="text-gray-900">language</code> — 참가자 경험 언어 (<code>ko</code> 한국어 · <code>en</code> 영어)</li>
                     <li><code className="text-gray-900">consent</code> — 동의 여부 (Y/N)</li>
                     <li><code className="text-gray-900">current_step</code> — 도달한 단계</li>

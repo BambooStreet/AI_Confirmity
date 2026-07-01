@@ -1,4 +1,4 @@
-export const COMMENT_COUNTS = [5, 10, 15, 20, 25, 30] as const;
+export const COMMENT_COUNTS = [3, 9, 27] as const;
 export type CommentCount = (typeof COMMENT_COUNTS)[number];
 
 export type ExperimentCondition = {
@@ -7,18 +7,12 @@ export type ExperimentCondition = {
 };
 
 export const VALID_CONDITIONS = [
-  "ai_5",
-  "ai_10",
-  "ai_15",
-  "ai_20",
-  "ai_25",
-  "ai_30",
-  "no_ai_5",
-  "no_ai_10",
-  "no_ai_15",
-  "no_ai_20",
-  "no_ai_25",
-  "no_ai_30",
+  "ai_3",
+  "ai_9",
+  "ai_27",
+  "no_ai_3",
+  "no_ai_9",
+  "no_ai_27",
 ] as const;
 
 export type ConditionKey = (typeof VALID_CONDITIONS)[number];

@@ -37,7 +37,7 @@ export function useExperimentSession(): ExperimentSession {
   const parsed = parseCondition(condition);
   return {
     participantId,
-    commentCount: parsed?.commentCount ?? 10,
+    commentCount: parsed?.commentCount ?? 9,
     hasAiLabel: parsed?.hasAiLabel ?? false,
     isReady: participantId.length > 0,
   };

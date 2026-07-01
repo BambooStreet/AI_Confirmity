@@ -77,7 +77,7 @@ export default function DebriefPage() {
         // 완료 기록 실패는 참가자 화면 흐름을 막지 않는다 (사후설문 제출 시 이미 기록됨)
       });
     }
-    // 조건(ai_5 등)으로 그룹별 완료 코드·리다이렉트 URL을 선택.
+    // 조건(ai_3 등)으로 그룹별 완료 코드·리다이렉트 URL을 선택.
     // localStorage는 SSR엔 없어 마운트 후 읽어야 하므로 effect 내 setState가 불가피하다
     // (초기값 undefined라 하이드레이션 불일치 없음).
     // eslint-disable-next-line react-hooks/set-state-in-effect

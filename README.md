@@ -25,16 +25,16 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 1. **랜딩 페이지에서 직접 선택** — `/`에 접속하면 조건 드롭다운이 노출됩니다.
 2. **URL 쿼리로 자동 진입** — `/?condition=<조건키>` 형식이면 곧바로 참가자 등록 후 동의 페이지로 이동합니다.
 
-**예시**: [http://localhost:3000/?condition=ai_10](http://localhost:3000/?condition=ai_10)
+**예시**: [http://localhost:3000/?condition=ai_9](http://localhost:3000/?condition=ai_9)
 
-### 유효한 조건키 (총 12종)
+### 유효한 조건키 (총 6종)
 
-조건은 AI 라벨 표시 여부(2수준) × 댓글 수(6수준) 조합입니다.
+조건은 AI 라벨 표시 여부(2수준) × 댓글 수(3수준) 조합입니다.
 
-| AI 라벨 \\ 댓글 수 | 5 | 10 | 15 | 20 | 25 | 30 |
-| --- | --- | --- | --- | --- | --- | --- |
-| 표시 | `ai_5` | `ai_10` | `ai_15` | `ai_20` | `ai_25` | `ai_30` |
-| 미표시 | `no_ai_5` | `no_ai_10` | `no_ai_15` | `no_ai_20` | `no_ai_25` | `no_ai_30` |
+| AI 라벨 \\ 댓글 수 | 3 | 9 | 27 |
+| --- | --- | --- | --- |
+| 표시 | `ai_3` | `ai_9` | `ai_27` |
+| 미표시 | `no_ai_3` | `no_ai_9` | `no_ai_27` |
 
 ### 실험 구성
 
