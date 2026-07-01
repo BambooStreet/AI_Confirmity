@@ -3,7 +3,7 @@ import type { SurveyQuestion } from "@/data/survey-questions";
 // 영어판 설문 — 한국어판(survey-questions.ts)과 같은 id·page·type, 옵션 위치를 맞춤.
 // 인구통계 문항(demo-*)과 커뮤니티 예시는 미국 표본에 맞게 조정됨.
 // ⚠️ 번역 초벌 — 연구팀 검수 필요. 원척도(영문)가 있는 문항은 원문으로 교체 권장.
-// NOTE: pre-survey cd-3("...sincere opinions.")는 영어판 전용 — 한국어판에는 대응 문항 없음.
+// NOTE: pre-survey cd-3("...swayed by others.")는 영어판 전용 — 한국어판에는 대응 문항 없음.
 
 export const likert7LabelsEn = [
   "Strongly disagree",
@@ -83,7 +83,7 @@ export const preSurveyQuestionsEn: SurveyQuestion[] = [
   },
   {
     id: "C3",
-    question: "How frequently do you use online communities?",
+    question: "How often do you use online communities?",
     type: "multiple_choice",
     required: true,
     options: frequency6OptionsEn,
@@ -92,7 +92,7 @@ export const preSurveyQuestionsEn: SurveyQuestion[] = [
   },
   {
     id: "C4",
-    question: "I tend to read the comments on posts in online communities.",
+    question: "I usually read the comments on posts in online communities.",
     type: "likert7",
     required: true,
     showIf: { id: "C2", equals: "Yes" },
@@ -102,7 +102,7 @@ export const preSurveyQuestionsEn: SurveyQuestion[] = [
   // ---------- Page 3: Perceptions of AI ----------
   {
     id: "ai-lit-1",
-    question: "I consider myself knowledgeable about AI technology.",
+    question: "I think I know AI technology well.",
     type: "likert7",
     required: true,
     page: 3,
@@ -117,7 +117,7 @@ export const preSurveyQuestionsEn: SurveyQuestion[] = [
   {
     id: "ai-lit-3",
     question:
-      "I can distinguish AI-generated content from human-written content.",
+      "I can distinguish AI-generated content from human-written one.",
     type: "likert7",
     required: true,
     page: 3,
@@ -127,42 +127,42 @@ export const preSurveyQuestionsEn: SurveyQuestion[] = [
   {
     id: "cd-1",
     question:
-      "The opinions expressed in community comments accurately reflect the general public's views.",
+      "I think the community opinions accurately reflect the public's view.",
     type: "likert7",
     required: true,
     page: 4,
   },
   {
     id: "cd-2",
-    question: "Comments with many upvotes in a community are trustworthy.",
+    question: "I think the upvoted comments in a community are trustworthy.",
     type: "likert7",
     required: true,
     page: 4,
   },
   {
     id: "cd-3",
-    question: "Community comments contain sincere opinions.",
+    question: "I think the community comments are swayed by others.",
     type: "likert7",
     required: true,
     page: 4,
   },
   {
     id: "foi-1",
-    question: "I am reluctant to express my opinion when I believe it is in the minority.",
+    question: "I feel reluctant to express my opinion when it is in the minority.",
     type: "likert7",
     required: true,
     page: 4,
   },
   {
     id: "foi-2",
-    question: "It is uncomfortable to disagree with other people.",
+    question: "I feel uncomfortable disagreeing with others.",
     type: "likert7",
     required: true,
     page: 4,
   },
   {
     id: "foi-3",
-    question: "I am afraid of being socially isolated.",
+    question: "I feel afraid of being socially isolated.",
     type: "likert7",
     required: true,
     page: 4,
@@ -170,7 +170,7 @@ export const preSurveyQuestionsEn: SurveyQuestion[] = [
   {
     id: "foi-4",
     question:
-      "Even in anonymous communities, it is burdensome to express opinions different from the majority.",
+      "I feel intimidated to voice my opinion different from the majority, even in anonymous communities.",
     type: "likert7",
     required: true,
     page: 4,
